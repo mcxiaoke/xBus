@@ -2,9 +2,9 @@ package com.mcxiaoke.bus;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * User: mcxiaoke
@@ -21,7 +21,7 @@ public class Bus {
         return SingletonHolder.INSTANCE;
     }
 
-    private Map<Object, List<Method>> mMethodMap = new HashMap<Object, List<Method>>();
+    private Map<Object, List<Method>> mMethodMap = new WeakHashMap<Object, List<Method>>();
 
     public void register(final Object target) {
         List<Method> methods = Helper.findAnnotatedMethods(target.getClass(), BusReceiver.class);
