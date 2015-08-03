@@ -3,10 +3,8 @@ package com.mcxiaoke.bus;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * User: mcxiaoke
@@ -24,65 +22,39 @@ public class Bus {
     }
 
     private Map<Object, List<Method>> mMethodMap = new HashMap<Object, List<Method>>();
-    private Map<Class<?>, Set<Object>> mTargetMap = new HashMap<Class<?>, Set<Object>>();
 
-    public boolean register(final Object target) {
+    public void register(final Object target) {
         List<Method> methods = Helper.findAnnotatedMethods(target.getClass(), BusReceiver.class);
         if (methods == null || methods.isEmpty()) {
-            return false;
+            return;
         }
-        System.out.println("register target=" + target);
         mMethodMap.put(target, methods);
-        for (Method method : methods) {
-            final Class<?> parameterClass = method.getParameterTypes()[0];
-            Set<Object> targets = mTargetMap.get(parameterClass);
-            if (targets == null) {
-                targets = new HashSet<Object>();
-                mTargetMap.put(parameterClass, targets);
-            }
-            targets.add(target);
-        }
-        return true;
     }
 
-    public boolean unregister(final Object target) {
-        System.out.println("unregister target=" + target);
+    public void unregister(final Object target) {
         mMethodMap.remove(target);
-        for (Map.Entry<Class<?>, Set<Object>> entry : mTargetMap.entrySet()) {
-            Set<Object> objects = entry.getValue();
-            if (objects == null || objects.isEmpty()) {
-                continue;
-            }
-            objects.remove(target);
-        }
-        return false;
     }
 
     public void post(Object event) {
-        System.out.println("post event=" + event);
-        Class<?> eventClass = event.getClass();
-        Set<Object> objects = mTargetMap.get(eventClass);
-        if (objects == null || objects.isEmpty()) {
-            return;
-        }
-        for (Object object : objects) {
-            List<Method> methods = mMethodMap.get(object);
+        final Class<?> eventClass = event.getClass();
+        for (Map.Entry<Object, List<Method>> entry : mMethodMap.entrySet()) {
+            final Object target = entry.getKey();
+            final List<Method> methods = entry.getValue();
             if (methods == null || methods.isEmpty()) {
                 continue;
             }
             for (Method method : methods) {
                 if (eventClass.equals(method.getParameterTypes()[0])) {
                     try {
-                        method.invoke(object, event);
+                        method.invoke(target, event);
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     } catch (InvocationTargetException e) {
                         e.printStackTrace();
                     }
-
                 }
             }
-
         }
     }
+
 }
