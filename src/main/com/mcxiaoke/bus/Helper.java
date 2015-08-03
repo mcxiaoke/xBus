@@ -15,30 +15,50 @@ import java.util.List;
  */
 final class Helper {
 
+    private static boolean shouldSkipClass(final Class<?> clazz) {
+        final String clsName = clazz.getName();
+        return Object.class.equals(clazz)
+                || clsName.startsWith("java.")
+                || clsName.startsWith("javax.")
+                || clsName.startsWith("android.")
+                || clsName.startsWith("com.android.");
+    }
+
+    private static boolean isAnnotatedMethod(final Method method,
+                                             final Class<? extends Annotation> annotation) {
+        // must has annotation
+        if (!method.isAnnotationPresent(annotation)) {
+            return false;
+        }
+        // must not static
+        if (Modifier.isStatic(method.getModifiers())) {
+            return false;
+        }
+        // must be public
+        if (!Modifier.isPublic(method.getModifiers())) {
+            return false;
+        }
+        // must has only one parameter
+        if (method.getParameterTypes().length != 1) {
+            return false;
+        }
+
+        return true;
+    }
+
     public static List<Method> findAnnotatedMethods(final Class<?> type,
                                                     final Class<? extends Annotation> annotation) {
+        Class<?> clazz = type;
         final List<Method> methods = new ArrayList<Method>();
-//        Class<?> clazz = type;
-        // for now ignore super class, handle current class only
-        Method[] ms = type.getDeclaredMethods();
-        for (Method method : ms) {
-            // must not static
-            if (Modifier.isStatic(method.getModifiers())) {
-                continue;
+        while (!shouldSkipClass(clazz)) {
+            final Method[] allMethods = clazz.getDeclaredMethods();
+            for (final Method method : allMethods) {
+                if (isAnnotatedMethod(method, annotation)) {
+                    methods.add(method);
+                }
             }
-            // must be public
-            if (!Modifier.isPublic(method.getModifiers())) {
-                continue;
-            }
-            // must has only one parameter
-            if (method.getParameterTypes().length != 1) {
-                continue;
-            }
-            // must has annotation
-            if (!method.isAnnotationPresent(annotation)) {
-                continue;
-            }
-            methods.add(method);
+            // search more methods in super class
+            clazz = clazz.getSuperclass();
         }
         return methods;
     }
@@ -60,7 +80,6 @@ final class Helper {
         builder.append("TypeParameters:{");
         for (TypeVariable<Method> cls : method.getTypeParameters()) {
             builder.append(cls.getName()).append(", ");
-            builder.append("true=" + (String.class.equals(cls)));
         }
         builder.append("}\n");
         builder.append("DeclaredAnnotations:{");
