@@ -2,7 +2,6 @@ package com.mcxiaoke.bus.demo;
 
 import com.mcxiaoke.bus.Bus;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,38 +36,24 @@ public class MainApp {
         demo3.start(bus);
         demo4.start(bus);
         demo5.start(bus);
-        final CountDownLatch countDownLatch = new CountDownLatch(1);
-        mExecutor.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-//                    Thread.sleep(200);
-//                    bus.post(new SomeEvent1());
-//                    Thread.sleep(200);
-//                    bus.post(new SomeEvent3());
-//                    Thread.sleep(200);
-//                    bus.post(new SomeEvent5());
-//                    Thread.sleep(200);
-//                    bus.post(new SomeEvent2());
-//                    Thread.sleep(200);
-//                    bus.post(new SomeEvent4());
-                    Thread.sleep(200);
-                    bus.post(new DemoEvent0());
-                    Thread.sleep(200);
-                    bus.post(new DemoEvent1());
-                    Thread.sleep(200);
-                    bus.post(new DemoEvent3());
-                    Thread.sleep(200);
-                    bus.post(new BaseDemoEvent());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
-                    countDownLatch.countDown();
-                }
-
-            }
-        });
-        countDownLatch.await();
+        Thread.sleep(200);
+        bus.post(new SomeEvent1());
+        Thread.sleep(200);
+        bus.post(new SomeEvent3());
+        Thread.sleep(200);
+        bus.post(new SomeEvent5());
+        Thread.sleep(200);
+        bus.post(new SomeEvent2());
+        Thread.sleep(200);
+        bus.post(new SomeEvent4());
+        Thread.sleep(200);
+        bus.post(new DemoEvent0());
+        Thread.sleep(200);
+        bus.post(new DemoEvent1());
+        Thread.sleep(200);
+        bus.post(new DemoEvent3());
+        Thread.sleep(200);
+        bus.post(new BaseDemoEvent());
         bus.unregister(demo1);
         bus.unregister(demo2);
         bus.unregister(demo3);
