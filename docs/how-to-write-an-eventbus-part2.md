@@ -1,6 +1,6 @@
 # 跟我一起写EventBus（二）
 
-在 [跟我一起写EventBus（一）](how-to-write-an-eventbus-part2.md) 里我们实现了一个非常粗糙的`EventBus`，在这一节里面我们要给这个`EventBus`添加以下两个功能：
+在 [跟我一起写EventBus（一）](how-to-write-an-eventbus-part1.md) 里我们实现了一个非常粗糙的`EventBus`，在这一节里面我们要给这个`EventBus`添加以下两个功能：
 
 * 支持在基类中调用 `register(target)` 注册，调用 `unregister(target)` 取消注册
 * 发送事件时， `post(event)` 支持匹配基类的事件接收器
