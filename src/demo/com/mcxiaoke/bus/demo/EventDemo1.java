@@ -10,8 +10,8 @@ import com.mcxiaoke.bus.BusReceiver;
 public class EventDemo1 {
 
     @BusReceiver
-    public void onReceive(SomeEvent1 event) {
-        System.out.println("EventDemo1.onReceive() event=" + event);
+    public void onReceive1(SomeEvent1 event) {
+        System.out.println("EventDemo1.onReceive1() event=" + event);
     }
 
     @BusReceiver

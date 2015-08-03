@@ -6,4 +6,9 @@ package com.mcxiaoke.bus.demo;
  * Time: 15:29
  */
 public class SomeEvent4 {
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
 }

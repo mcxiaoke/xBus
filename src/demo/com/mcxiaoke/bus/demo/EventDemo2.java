@@ -11,8 +11,8 @@ public class EventDemo2 {
 
 
     @BusReceiver
-    public void onReceive(SomeEvent1 event) {
-        System.out.println("EventDemo2.onReceive() event=" + event);
+    public void onReceive1(SomeEvent1 event) {
+        System.out.println("EventDemo2.onReceive1() event=" + event);
     }
 
     @BusReceiver
@@ -21,7 +21,7 @@ public class EventDemo2 {
     }
 
     @BusReceiver
-    public void onReceive4(SomeEvent4 event) {
-        System.out.println("EventDemo2.onReceive4() event=" + event);
+    public void onReceive3(SomeEvent3 event) {
+        System.out.println("EventDemo2.onReceive3() event=" + event);
     }
 }
