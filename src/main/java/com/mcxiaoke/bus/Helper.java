@@ -74,7 +74,7 @@ final class Helper {
         builder.append("}\n");
         builder.append("GenericParameterTypes:{");
         for (Type cls : method.getGenericParameterTypes()) {
-            builder.append(cls.getTypeName()).append(", ");
+            builder.append(cls.getClass()).append(", ");
         }
         builder.append("}\n");
         builder.append("TypeParameters:{");
