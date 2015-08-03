@@ -44,7 +44,8 @@ public class Bus {
                 continue;
             }
             for (Method method : methods) {
-                if (eventClass.equals(method.getParameterTypes()[0])) {
+                Class<?> parameterClass = method.getParameterTypes()[0];
+                if (parameterClass.isAssignableFrom(eventClass)) {
                     try {
                         method.invoke(target, event);
                     } catch (IllegalAccessException e) {
