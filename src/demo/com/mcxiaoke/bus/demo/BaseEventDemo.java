@@ -10,12 +10,12 @@ import com.mcxiaoke.bus.BusReceiver;
  */
 public class BaseEventDemo {
 
-    public void start(Bus bus){
-       bus.register(this);
+    public void start(Bus bus) {
+        bus.register(this);
     }
 
-    public void stop(Bus bus){
-      bus.unregister(this);
+    public void stop(Bus bus) {
+        bus.unregister(this);
     }
 
     @BusReceiver
@@ -35,4 +35,29 @@ public class BaseEventDemo {
         System.out.println("onBaseReceive3() event=" + event
                 + " class=" + this.getClass().getSimpleName());
     }
+
+    @BusReceiver
+    public void onDemoReceive0(BaseDemoEvent event) {
+        System.out.println("onDemoReceive0() event=" + event
+                + " class=" + this.getClass().getSimpleName());
+    }
+
+    @BusReceiver
+    public void onDemoReceive1(BaseDemoEvent event) {
+        System.out.println("onDemoReceive1() event=" + event
+                + " class=" + this.getClass().getSimpleName());
+    }
+
+    @BusReceiver
+    public void onDemoReceive2(IDemoEvent event) {
+        System.out.println("onDemoReceive2() event=" + event
+                + " class=" + this.getClass().getSimpleName());
+    }
+
+    @BusReceiver
+    public void onDemoReceive3(IDemoEvent event) {
+        System.out.println("onDemoReceive3() event=" + event
+                + " class=" + this.getClass().getSimpleName());
+    }
+
 }

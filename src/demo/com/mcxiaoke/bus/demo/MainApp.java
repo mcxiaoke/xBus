@@ -42,16 +42,24 @@ public class MainApp {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(500);
-                    bus.post(new SomeEvent1());
-                    Thread.sleep(500);
-                    bus.post(new SomeEvent3());
-                    Thread.sleep(500);
-                    bus.post(new SomeEvent5());
-                    Thread.sleep(500);
-                    bus.post(new SomeEvent2());
-                    Thread.sleep(500);
-                    bus.post(new SomeEvent4());
+//                    Thread.sleep(200);
+//                    bus.post(new SomeEvent1());
+//                    Thread.sleep(200);
+//                    bus.post(new SomeEvent3());
+//                    Thread.sleep(200);
+//                    bus.post(new SomeEvent5());
+//                    Thread.sleep(200);
+//                    bus.post(new SomeEvent2());
+//                    Thread.sleep(200);
+//                    bus.post(new SomeEvent4());
+                    Thread.sleep(200);
+                    bus.post(new DemoEvent0());
+                    Thread.sleep(200);
+                    bus.post(new DemoEvent1());
+                    Thread.sleep(200);
+                    bus.post(new DemoEvent3());
+                    Thread.sleep(200);
+                    bus.post(new BaseDemoEvent());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
@@ -66,6 +74,9 @@ public class MainApp {
         bus.unregister(demo3);
         demo4.stop(bus);
         demo5.stop(bus);
+
+        System.out.println("exit.");
+        System.exit(0);
     }
 
 
