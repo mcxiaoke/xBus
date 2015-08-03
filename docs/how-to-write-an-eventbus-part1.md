@@ -161,7 +161,7 @@ public @interface BusReceiver {
 
 因为判断`Method`的修饰符和参数列表长度比较快， 我们放在前面，`method.isAnnotationPresent`这个方法比较慢，放在最后。
 
-### `register(target)`的实现，第一步
+### `register(target)`的实现
 
 有了`findAnnotatedMethods`方法，`register(target)`的实现就简单多了，这个方法需要找出所有符合条件的事件接收器方法，然后保存起来，由于后面我们要根据对象查找方法，我们将`target:method`关系保存到一个`Map`中，假设我们的`IBus`接口的实现类叫`Bus`，在`Bus`类中增加一个成员变量保存它们：
 
@@ -177,7 +177,7 @@ public @interface BusReceiver {
     }
 ```
 
-### `unregister(target)`的实现，第一步
+### `unregister(target)`的实现
 
 有了上面保存的`mMethodMap`数据，取消注册目标就是移除目标对象注册过的所有事件接收器方法，可以这样写：
 
