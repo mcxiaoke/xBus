@@ -5,8 +5,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * User: mcxiaoke
@@ -30,12 +30,19 @@ final class Helper {
         if (!method.isAnnotationPresent(annotation)) {
             return false;
         }
+        // must be public
+        if (!Modifier.isPublic(method.getModifiers())) {
+            return false;
+        }
         // must not static
         if (Modifier.isStatic(method.getModifiers())) {
             return false;
         }
-        // must be public
-        if (!Modifier.isPublic(method.getModifiers())) {
+        // must not be volatile
+        // fix getDeclaredMethods bug, if method in base class,
+        // it returns duplicate method,
+        // one is normal, the other is the same but with volatile modifier
+        if (Modifier.isVolatile(method.getModifiers())) {
             return false;
         }
         // must has only one parameter
@@ -46,10 +53,10 @@ final class Helper {
         return true;
     }
 
-    public static List<Method> findAnnotatedMethods(final Class<?> type,
-                                                    final Class<? extends Annotation> annotation) {
+    public static Set<Method> findAnnotatedMethods(final Class<?> type,
+                                                   final Class<? extends Annotation> annotation) {
         Class<?> clazz = type;
-        final List<Method> methods = new ArrayList<Method>();
+        final Set<Method> methods = new HashSet<Method>();
         while (!shouldSkipClass(clazz)) {
             final Method[] allMethods = clazz.getDeclaredMethods();
             for (final Method method : allMethods) {

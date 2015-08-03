@@ -2,8 +2,8 @@ package com.mcxiaoke.bus;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
@@ -21,10 +21,14 @@ public class Bus {
         return SingletonHolder.INSTANCE;
     }
 
-    private Map<Object, List<Method>> mMethodMap = new WeakHashMap<Object, List<Method>>();
+    private Map<Object, Set<Method>> mMethodMap = new WeakHashMap<Object, Set<Method>>();
 
     public void register(final Object target) {
-        List<Method> methods = Helper.findAnnotatedMethods(target.getClass(), BusReceiver.class);
+        if (mMethodMap.containsKey(target)) {
+            System.err.println("target " + target + " is already registered");
+            return;
+        }
+        Set<Method> methods = Helper.findAnnotatedMethods(target.getClass(), BusReceiver.class);
         if (methods == null || methods.isEmpty()) {
             return;
         }
@@ -32,14 +36,16 @@ public class Bus {
     }
 
     public void unregister(final Object target) {
+        System.out.println("unregister() target=" + target);
         mMethodMap.remove(target);
     }
 
     public void post(Object event) {
         final Class<?> eventClass = event.getClass();
-        for (Map.Entry<Object, List<Method>> entry : mMethodMap.entrySet()) {
+        int sentCount = 0;
+        for (Map.Entry<Object, Set<Method>> entry : mMethodMap.entrySet()) {
             final Object target = entry.getKey();
-            final List<Method> methods = entry.getValue();
+            final Set<Method> methods = entry.getValue();
             if (methods == null || methods.isEmpty()) {
                 continue;
             }
@@ -47,7 +53,10 @@ public class Bus {
                 Class<?> parameterClass = method.getParameterTypes()[0];
                 if (parameterClass.isAssignableFrom(eventClass)) {
                     try {
+                        System.out.println("post event to "
+                                + target + "." + method.getName());
                         method.invoke(target, event);
+                        sentCount++;
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     } catch (InvocationTargetException e) {
@@ -55,6 +64,9 @@ public class Bus {
                     }
                 }
             }
+        }
+        if (sentCount == 0) {
+            System.err.println("no receiver found for event: " + event);
         }
     }
 
