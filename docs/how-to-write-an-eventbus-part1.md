@@ -300,17 +300,17 @@ public class BusDemo {
 ## 相关阅读
 
 #### 什么是EventBus
-<https://code.google.com/p/guava-libraries/wiki/EventBusExplained>
-<http://doc.akka.io/docs/akka/snapshot/java/event-bus.html>
+<https://code.google.com/p/guava-libraries/wiki/EventBusExplained>  
+<http://doc.akka.io/docs/akka/snapshot/java/event-bus.html>  
 
 #### EventBus的实现
-<http://javarticles.com/2015/04/guava-eventbus-examples.html>
-<http://timnew.me/blog/2014/12/06/typical-eventbus-design-patterns/>
-<https://code.google.com/p/simpleeventbus/>
-<https://github.com/greenrobot/EventBus/blob/master/HOWTO.md>
+<http://javarticles.com/2015/04/guava-eventbus-examples.html>  
+<http://timnew.me/blog/2014/12/06/typical-eventbus-design-patterns/>  
+<https://code.google.com/p/simpleeventbus/>  
+<https://github.com/greenrobot/EventBus/blob/master/HOWTO.md>  
 
 #### EventBus的使用
-<http://www.cnblogs.com/peida/p/eventbus.html>
-<http://blog.cainwong.com/using-an-eventbus-in-android-pt-1-why-an-eventbus/>
-<http://blog.cainwong.com/using-an-eventbus-in-android-pt-2-sticking-your-config/>
-<http://blog.cainwong.com/using-an-eventbus-in-android-pt-3-threading/>
+<http://www.cnblogs.com/peida/p/eventbus.html>  
+<http://blog.cainwong.com/using-an-eventbus-in-android-pt-1-why-an-eventbus/>  
+<http://blog.cainwong.com/using-an-eventbus-in-android-pt-2-sticking-your-config/>  
+<http://blog.cainwong.com/using-an-eventbus-in-android-pt-3-threading/>  
