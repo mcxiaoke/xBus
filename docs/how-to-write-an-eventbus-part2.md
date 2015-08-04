@@ -7,7 +7,7 @@
 
 ## 基类注册
 
-支持 `register` 和 `unregister` 的继承，用法如下：
+支持 `register` 和 `unregister` 在基类中使用，用法如下：
 
 ```java
 // 基类
