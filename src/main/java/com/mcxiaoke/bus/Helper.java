@@ -1,6 +1,6 @@
 package com.mcxiaoke.bus;
 
-import com.mcxiaoke.bus.Bus.Subscriber;
+import com.mcxiaoke.bus.Bus.MethodInfo;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -55,23 +55,40 @@ final class Helper {
         return true;
     }
 
-    public static Set<Subscriber> findSubscriber(final Object target,
-                                                 final Class<? extends Annotation> annotation) {
-        Class<?> clazz = target.getClass();
-        final Set<Subscriber> subscribers = new HashSet<Subscriber>();
+    public static Set<MethodInfo> findSubscriberMethods(final Class<?> targetClass) {
+        Class<?> clazz = targetClass;
+        final Set<MethodInfo> methods = new HashSet<MethodInfo>();
         while (!shouldSkipClass(clazz)) {
-            final Method[] allMethods = clazz.getDeclaredMethods();
-            System.out.println("findSubscriber() " + clazz.getSimpleName()
-                    + " has " + allMethods.length + " methods");
-            for (final Method method : allMethods) {
-                if (isAnnotatedMethod(method, annotation)) {
-                    subscribers.add(new Subscriber(method, target));
+            final Method[] clsMethods = clazz.getDeclaredMethods();
+            System.out.println("findSubscriberMethods() " + clazz.getSimpleName()
+                    + " has " + clsMethods.length + " methods");
+            for (final Method method : clsMethods) {
+                if (isAnnotatedMethod(method, BusReceiver.class)) {
+                    methods.add(new MethodInfo(method, clazz));
                 }
             }
             // search more methods in super class
             clazz = clazz.getSuperclass();
         }
-        return subscribers;
+        return methods;
+    }
+
+    private static void addInterfaces(Set<Class<?>> types, Class<?>[] interfaces) {
+        for (Class<?> interfaceClass : interfaces) {
+            types.add(interfaceClass);
+            addInterfaces(types, interfaceClass.getInterfaces());
+        }
+    }
+
+    public static Set<Class<?>> findSuperTypes(Class<?> targetClass) {
+        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Class<?> clazz = targetClass;
+        while (clazz != null) {
+            classes.add(clazz);
+            addInterfaces(classes, clazz.getInterfaces());
+            clazz = clazz.getSuperclass();
+        }
+        return classes;
     }
 
     public static void dumpMethod(final Method method) {
