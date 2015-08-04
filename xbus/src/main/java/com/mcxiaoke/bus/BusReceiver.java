@@ -14,5 +14,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface BusReceiver {
 
-    BusMode mode() default BusMode.Main;
+    EventMode mode() default EventMode.Main;
 }

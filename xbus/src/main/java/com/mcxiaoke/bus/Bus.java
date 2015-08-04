@@ -1,10 +1,11 @@
 package com.mcxiaoke.bus;
 
 import android.util.Log;
+import com.mcxiaoke.bus.method.AnnotationMethodFinder;
+import com.mcxiaoke.bus.method.MethodFinder;
 import com.mcxiaoke.bus.scheduler.Scheduler;
 import com.mcxiaoke.bus.scheduler.Schedulers;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -46,6 +47,8 @@ public class Bus {
     // eventType->subscriber set
     private Map<Class<?>, Set<Subscriber>> mSubscriberMap;
 
+    private MethodFinder mMethodFinder;
+
     private Scheduler mMainScheduler;
     private Scheduler mSenderScheduler;
     private Scheduler mThreadScheduler;
@@ -55,16 +58,25 @@ public class Bus {
         mEventTypeCache = new ConcurrentHashMap<String, Set<Class<?>>>();
         mEventMap = new ConcurrentHashMap<Object, Set<Class<?>>>();
         mSubscriberMap = new ConcurrentHashMap<Class<?>, Set<Subscriber>>();
+        mMethodFinder = new AnnotationMethodFinder();
         mMainScheduler = Schedulers.main(this);
         mSenderScheduler = Schedulers.sender(this);
         mThreadScheduler = Schedulers.thread(this);
+    }
+
+    public MethodFinder getMethodFinder() {
+        return mMethodFinder;
+    }
+
+    public void setMethodFinder(final MethodFinder finder) {
+        mMethodFinder = finder;
     }
 
     private Set<MethodInfo> getMethods(Class<?> targetClass) {
         String cacheKey = targetClass.getName();
         Set<MethodInfo> methods = mMethodCache.get(cacheKey);
         if (methods == null) {
-            methods = Helper.findSubscriberMethods(targetClass);
+            methods = mMethodFinder.findSubscriberMethods(targetClass);
             mMethodCache.put(cacheKey, methods);
         }
         return methods;
@@ -137,11 +149,11 @@ public class Bus {
     public void sendEvent(final Object event, Subscriber subscriber) {
         Log.v(TAG, "sendEvent event=" + event + " subscriber=" + subscriber);
         final EventSender sender = new EventSender(event, subscriber);
-        if (BusMode.Sender.equals(subscriber.mode)) {
+        if (EventMode.Sender.equals(subscriber.mode)) {
             mSenderScheduler.post(sender);
-        } else if (BusMode.Main.equals(subscriber.mode)) {
+        } else if (EventMode.Main.equals(subscriber.mode)) {
             mMainScheduler.post(sender);
-        } else if (BusMode.Thread.equals(subscriber.mode)) {
+        } else if (EventMode.Thread.equals(subscriber.mode)) {
             mThreadScheduler.post(sender);
         }
     }

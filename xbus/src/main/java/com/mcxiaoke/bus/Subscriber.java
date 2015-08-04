@@ -10,7 +10,7 @@ public class Subscriber {
     public final Object target;
     public final Class<?> targetType;
     public final Class<?> eventType;
-    public final BusMode mode;
+    public final EventMode mode;
     public final String name;
 
     public Subscriber(final MethodInfo method, final Object target) {

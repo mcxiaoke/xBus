@@ -5,7 +5,7 @@ package com.mcxiaoke.bus;
  * Date: 15/8/4
  * Time: 15:04
  */
-public enum BusMode {
+public enum EventMode {
 
     Sender, Main, Thread
 }
