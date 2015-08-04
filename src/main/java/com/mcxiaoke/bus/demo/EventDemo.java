@@ -9,20 +9,28 @@ package com.mcxiaoke.bus.demo;
 import com.mcxiaoke.bus.Bus;
 import com.mcxiaoke.bus.BusReceiver;
 
+import java.awt.*;
+
 /**
  * Output:
  * onCharSequenceEvent() event=A StringBuilder
  * onObjectEvent() event=A StringBuilder
  */
-public class EventDemo {
+public class EventDemo extends Component {
 
     public static void main(String[] args) {
         new EventDemo().run();
     }
 
     public void run() {
+        long start = System.nanoTime();
         Bus.getDefault().register(this);
         Bus.getDefault().post(new StringBuilder("A StringBuilder"));
+        for (int i = 0; i < 5; i++) {
+            Bus.getDefault().post(new StringBuilder("A StringBuilder +" + i));
+        }
+        long end = System.nanoTime();
+        System.out.println("elapsed time: " + (end - start) / 1000000 + "ms");
         Bus.getDefault().unregister(this);
     }
 
