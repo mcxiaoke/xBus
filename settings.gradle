@@ -1,1 +1,1 @@
-include ':xbus'
+include ':xbus', ':sample'
