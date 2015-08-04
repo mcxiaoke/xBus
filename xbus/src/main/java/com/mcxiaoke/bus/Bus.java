@@ -1,6 +1,9 @@
 package com.mcxiaoke.bus;
 
-import java.lang.reflect.Method;
+import android.util.Log;
+import com.mcxiaoke.bus.scheduler.Scheduler;
+import com.mcxiaoke.bus.scheduler.Schedulers;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,99 +17,6 @@ import java.util.Set;
  */
 public class Bus {
 
-    static class MethodInfo {
-        public final Method method;
-        public final Class<?> targetType;
-        public final Class<?> eventType;
-        public final String name;
-        public final BusMode mode;
-
-        public MethodInfo(final Method method, final Class<?> targetClass, final BusMode mode) {
-            this.method = method;
-            this.targetType = targetClass;
-            this.eventType = method.getParameterTypes()[0];
-            this.mode = mode;
-            this.name = targetType.getName() + "." + method.getName()
-                    + "(" + eventType.getName() + ")";
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            final MethodInfo that = (MethodInfo) o;
-            return name.equals(that.name);
-
-        }
-
-        @Override
-        public int hashCode() {
-            return name.hashCode();
-        }
-    }
-
-    static class EventSender {
-        public final Object event;
-        public final Subscriber subscriber;
-        public final Class<?> eventType;
-
-        public EventSender(final Object event, final Subscriber subscriber) {
-            this.event = event;
-            this.subscriber = subscriber;
-            this.eventType = event.getClass();
-        }
-
-        public Object send() {
-            try {
-                System.out.println("send event:[" + eventType.getSimpleName()
-                        + "] to subscriber:[" + subscriber.targetType.getSimpleName() + "]");
-                return subscriber.invoke(event);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    static class Subscriber {
-        public final MethodInfo method;
-        public final Object target;
-        public final Class<?> targetType;
-        public final Class<?> eventType;
-        public final String name;
-
-        public Subscriber(final MethodInfo method, final Object target) {
-            this.method = method;
-            this.target = target;
-            this.eventType = method.eventType;
-            this.targetType = target.getClass();
-            this.name = method.name;
-        }
-
-        public Object invoke(Object event) {
-            try {
-                return this.method.method.invoke(this.target, event);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
-        }
-
-        public boolean match(final Class<?> eventClass) {
-            return this.eventType.isAssignableFrom(eventClass);
-        }
-
-        @Override
-        public String toString() {
-            return targetType.getSimpleName() + "."
-                    + method.method.getName()
-                    + "(" + eventType.getSimpleName() + ")"
-                    + "-" + method.mode.name();
-        }
-
-
-    }
-
     private static class SingletonHolder {
         static final Bus INSTANCE = new Bus();
     }
@@ -114,6 +24,9 @@ public class Bus {
     public static Bus getDefault() {
         return SingletonHolder.INSTANCE;
     }
+
+    private static final String TAG = Bus.class.getSimpleName();
+    private static final boolean DEBUG = BuildConfig.DEBUG;
 
     // key=注册类的完整类名 target.getClass().getName()
     // value=注册类包含的合法的@BusReceiver方法对象集合
@@ -132,11 +45,18 @@ public class Bus {
     // eventType->subscriber set
     private Map<Class<?>, Set<Subscriber>> mSubscriberMap;
 
+    private Scheduler mMainScheduler;
+    private Scheduler mSenderScheduler;
+    private Scheduler mThreadScheduler;
+
     private Bus() {
         mMethodCache = new HashMap<String, Set<MethodInfo>>();
         mEventTypeCache = new HashMap<String, Set<Class<?>>>();
         mEventMap = new HashMap<Object, Set<Class<?>>>();
         mSubscriberMap = new HashMap<Class<?>, Set<Subscriber>>();
+        mMainScheduler = Schedulers.main(this);
+        mSenderScheduler = Schedulers.sender(this);
+        mThreadScheduler = Schedulers.thread(this);
     }
 
     private Set<MethodInfo> getMethods(Class<?> targetClass) {
@@ -169,12 +89,12 @@ public class Bus {
     }
 
     public void register(final Object target) {
-        System.out.println("register() target=" + target);
+        Log.v(TAG, "register() target=" + target);
         addSubscribers(target);
     }
 
     public void unregister(final Object target) {
-        System.out.println("unregister() target=" + target);
+        Log.v(TAG, "unregister() target=" + target);
         final Set<Class<?>> eventTypes = mEventMap.remove(target);
         for (Class<?> eventType : eventTypes) {
             Set<Subscriber> subscribers = mSubscriberMap.get(eventType);
@@ -186,7 +106,7 @@ public class Bus {
                 final Subscriber subscriber = it.next();
                 if (subscriber.target == target) {
                     it.remove();
-                    System.out.println("unregister() remove " + subscriber);
+                    Log.v(TAG, "unregister() remove " + subscriber);
                 }
             }
         }
@@ -207,9 +127,21 @@ public class Bus {
             }
             for (Subscriber subscriber : subscribers) {
                 if (subscriber.match(eventType)) {
-                    new EventSender(event, subscriber).send();
+                    sendEvent(event, subscriber);
                 }
             }
+        }
+    }
+
+    public void sendEvent(final Object event, Subscriber subscriber) {
+        Log.v(TAG, "sendEvent event=" + event + " subscriber=" + subscriber);
+        final EventSender sender = new EventSender(event, subscriber);
+        if (BusMode.Sender.equals(subscriber.mode)) {
+            mSenderScheduler.post(sender);
+        } else if (BusMode.Main.equals(subscriber.mode)) {
+            mMainScheduler.post(sender);
+        } else if (BusMode.Thread.equals(subscriber.mode)) {
+            mThreadScheduler.post(sender);
         }
     }
 
@@ -223,24 +155,24 @@ public class Bus {
 
     // for debug only
     public void dump() {
-        System.out.println("----------------------------------");
-        System.out.println("<Target-Events>");
+        Log.v(TAG, "----------------------------------");
+        Log.v(TAG, "<Target-Events>");
         for (Map.Entry<Object, Set<Class<?>>> entry : mEventMap.entrySet()) {
-            System.out.println("  Target:" + entry.getKey().getClass().getSimpleName());
+            Log.v(TAG, "  Target:" + entry.getKey().getClass().getSimpleName());
             Set<Class<?>> eventTypes = entry.getValue();
             for (Class<?> eventType : eventTypes) {
-                System.out.println("    EventType:" + eventType.getSimpleName());
+                Log.v(TAG, "    EventType:" + eventType.getSimpleName());
             }
         }
-        System.out.println("<Event-Subscribers>");
+        Log.v(TAG, "<Event-Subscribers>");
         for (Map.Entry<Class<?>, Set<Subscriber>> entry : mSubscriberMap.entrySet()) {
-            System.out.println("  EventType:" + entry.getKey().getSimpleName());
+            Log.v(TAG, "  EventType:" + entry.getKey().getSimpleName());
             Set<Subscriber> subscribers = entry.getValue();
             for (Subscriber subscriber : subscribers) {
-                System.out.println("    Subscriber:" + subscriber);
+                Log.v(TAG, "    Subscriber:" + subscriber);
             }
         }
-        System.out.println("----------------------------------");
+        Log.v(TAG, "----------------------------------");
     }
 
 }

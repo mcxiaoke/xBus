@@ -1,6 +1,6 @@
 package com.mcxiaoke.bus;
 
-import com.mcxiaoke.bus.Bus.MethodInfo;
+import com.mcxiaoke.bus.MethodInfo;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
