@@ -9,14 +9,12 @@ package com.mcxiaoke.bus.demo;
 import com.mcxiaoke.bus.Bus;
 import com.mcxiaoke.bus.BusReceiver;
 
-import java.awt.*;
-
 /**
  * Output:
  * onCharSequenceEvent() event=A StringBuilder
  * onObjectEvent() event=A StringBuilder
  */
-public class EventDemo extends Component {
+public class EventDemo {
 
     public static void main(String[] args) {
         new EventDemo().run();
