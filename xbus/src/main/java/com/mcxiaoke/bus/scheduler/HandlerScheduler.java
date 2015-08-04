@@ -4,7 +4,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import com.mcxiaoke.bus.Bus;
-import com.mcxiaoke.bus.EventSender;
 
 /**
  * User: mcxiaoke
@@ -24,15 +23,15 @@ class HandlerScheduler implements Scheduler, Handler.Callback {
     @Override
     public boolean handleMessage(final Message msg) {
         if (msg.obj != null) {
-            final EventSender sender = (EventSender) msg.obj;
-            sender.send();
+            final Runnable runnable = (Runnable) msg.obj;
+            runnable.run();
         }
         return true;
     }
 
     @Override
-    public void post(final EventSender sender) {
-        final Message message = mHandler.obtainMessage(0, sender);
+    public void post(final Runnable runnable) {
+        final Message message = mHandler.obtainMessage(0, runnable);
         mHandler.sendMessage(message);
     }
 }

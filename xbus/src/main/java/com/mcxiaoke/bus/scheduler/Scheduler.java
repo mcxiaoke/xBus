@@ -1,7 +1,5 @@
 package com.mcxiaoke.bus.scheduler;
 
-import com.mcxiaoke.bus.EventSender;
-
 /**
  * User: mcxiaoke
  * Date: 15/8/4
@@ -9,5 +7,5 @@ import com.mcxiaoke.bus.EventSender;
  */
 public interface Scheduler {
 
-    void post(EventSender sender);
+    void post(Runnable runnable);
 }

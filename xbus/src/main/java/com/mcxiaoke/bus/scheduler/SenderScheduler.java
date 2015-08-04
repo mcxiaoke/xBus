@@ -1,7 +1,6 @@
 package com.mcxiaoke.bus.scheduler;
 
 import com.mcxiaoke.bus.Bus;
-import com.mcxiaoke.bus.EventSender;
 
 /**
  * User: mcxiaoke
@@ -16,7 +15,7 @@ class SenderScheduler implements Scheduler {
     }
 
     @Override
-    public void post(final EventSender sender) {
-        sender.send();
+    public void post(final Runnable runnable) {
+        runnable.run();
     }
 }

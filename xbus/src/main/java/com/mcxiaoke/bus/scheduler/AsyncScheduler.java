@@ -1,7 +1,6 @@
 package com.mcxiaoke.bus.scheduler;
 
 import com.mcxiaoke.bus.Bus;
-import com.mcxiaoke.bus.EventSender;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,12 +20,7 @@ class AsyncScheduler implements Scheduler {
     }
 
     @Override
-    public void post(final EventSender sender) {
-        mExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                sender.send();
-            }
-        });
+    public void post(final Runnable runnable) {
+        mExecutor.execute(runnable);
     }
 }

@@ -7,7 +7,7 @@ import android.util.Log;
  * Date: 15/8/4
  * Time: 15:42
  */
-public class EventSender {
+public class EventSender implements Runnable {
     private static final String TAG = EventSender.class.getSimpleName();
 
     public final Object event;
@@ -16,6 +16,11 @@ public class EventSender {
     public EventSender(final Object event, final Subscriber subscriber) {
         this.event = event;
         this.subscriber = subscriber;
+    }
+
+    @Override
+    public void run() {
+        send();
     }
 
     public Object send() {
