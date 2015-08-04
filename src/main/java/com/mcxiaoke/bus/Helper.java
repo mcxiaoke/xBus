@@ -64,7 +64,8 @@ final class Helper {
                     + " has " + clsMethods.length + " methods");
             for (final Method method : clsMethods) {
                 if (isAnnotatedMethod(method, BusReceiver.class)) {
-                    methods.add(new MethodInfo(method, clazz));
+                    BusReceiver annotation = method.getAnnotation(BusReceiver.class);
+                    methods.add(new MethodInfo(method, clazz, annotation.mode()));
                 }
             }
             // search more methods in super class

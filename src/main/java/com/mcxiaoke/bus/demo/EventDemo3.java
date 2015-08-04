@@ -1,5 +1,6 @@
 package com.mcxiaoke.bus.demo;
 
+import com.mcxiaoke.bus.BusMode;
 import com.mcxiaoke.bus.BusReceiver;
 
 /**
@@ -25,13 +26,13 @@ public class EventDemo3 extends BaseEventDemo {
         System.out.println("EventDemo3.onReceive3() event=" + event);
     }
 
-    @BusReceiver
+    @BusReceiver(mode = BusMode.Thread)
     public void onDemo0(BaseDemoEvent event) {
         System.out.println("onDemo0() event=" + event
                 + " class=" + this.getClass().getSimpleName());
     }
 
-    @BusReceiver
+    @BusReceiver(mode = BusMode.Sender)
     public void onDemo1(BaseDemoEvent event) {
         System.out.println("onDemo1() event=" + event
                 + " class=" + this.getClass().getSimpleName());

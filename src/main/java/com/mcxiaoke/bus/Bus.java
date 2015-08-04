@@ -19,11 +19,13 @@ public class Bus {
         public final Class<?> targetType;
         public final Class<?> eventType;
         public final String name;
+        public final BusMode mode;
 
-        public MethodInfo(final Method method, final Class<?> targetClass) {
+        public MethodInfo(final Method method, final Class<?> targetClass, final BusMode mode) {
             this.method = method;
             this.targetType = targetClass;
             this.eventType = method.getParameterTypes()[0];
+            this.mode = mode;
             this.name = targetType.getName() + "." + method.getName()
                     + "(" + eventType.getName() + ")";
         }
@@ -98,7 +100,8 @@ public class Bus {
         public String toString() {
             return targetType.getSimpleName() + "."
                     + method.method.getName()
-                    + "(" + eventType.getSimpleName() + ")";
+                    + "(" + eventType.getSimpleName() + ")"
+                    + "-" + method.mode.name();
         }
 
 
