@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * User: mcxiaoke
@@ -50,10 +51,10 @@ public class Bus {
     private Scheduler mThreadScheduler;
 
     private Bus() {
-        mMethodCache = new HashMap<String, Set<MethodInfo>>();
-        mEventTypeCache = new HashMap<String, Set<Class<?>>>();
-        mEventMap = new HashMap<Object, Set<Class<?>>>();
-        mSubscriberMap = new HashMap<Class<?>, Set<Subscriber>>();
+        mMethodCache = new ConcurrentHashMap<String, Set<MethodInfo>>();
+        mEventTypeCache = new ConcurrentHashMap<String, Set<Class<?>>>();
+        mEventMap = new ConcurrentHashMap<Object, Set<Class<?>>>();
+        mSubscriberMap = new ConcurrentHashMap<Class<?>, Set<Subscriber>>();
         mMainScheduler = Schedulers.main(this);
         mSenderScheduler = Schedulers.sender(this);
         mThreadScheduler = Schedulers.thread(this);

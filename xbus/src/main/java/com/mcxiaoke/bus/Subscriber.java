@@ -17,7 +17,7 @@ public class Subscriber {
         this.method = method;
         this.target = target;
         this.eventType = method.eventType;
-        this.targetType = target.getClass();
+        this.targetType = method.targetType;
         this.mode = method.mode;
         this.name = method.name;
     }

@@ -23,7 +23,6 @@ class HandlerScheduler implements Scheduler, Handler.Callback {
 
     @Override
     public boolean handleMessage(final Message msg) {
-        System.out.println("handleMessage() " + msg.obj);
         if (msg.obj != null) {
             final EventSender sender = (EventSender) msg.obj;
             sender.send();
