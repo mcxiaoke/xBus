@@ -24,6 +24,7 @@ public class EventDemo extends Component {
 
     public void run() {
         long start = System.nanoTime();
+        Bus.getDefault().post(new StringBuilder("Before Unregister"));
         Bus.getDefault().register(this);
         Bus.getDefault().post(new StringBuilder("A StringBuilder"));
         for (int i = 0; i < 5; i++) {
@@ -32,6 +33,8 @@ public class EventDemo extends Component {
         long end = System.nanoTime();
         System.out.println("elapsed time: " + (end - start) / 1000000 + "ms");
         Bus.getDefault().unregister(this);
+//        Bus.getDefault().post(new StringBuilder("After Unregister"));
+        Bus.getDefault().dump();
     }
 
     @BusReceiver
