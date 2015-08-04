@@ -1,5 +1,7 @@
 package com.mcxiaoke.bus;
 
+import com.mcxiaoke.bus.Bus.Subscriber;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -53,21 +55,23 @@ final class Helper {
         return true;
     }
 
-    public static Set<Method> findAnnotatedMethods(final Class<?> type,
-                                                   final Class<? extends Annotation> annotation) {
-        Class<?> clazz = type;
-        final Set<Method> methods = new HashSet<Method>();
+    public static Set<Subscriber> findSubscriber(final Object target,
+                                                 final Class<? extends Annotation> annotation) {
+        Class<?> clazz = target.getClass();
+        final Set<Subscriber> subscribers = new HashSet<Subscriber>();
         while (!shouldSkipClass(clazz)) {
             final Method[] allMethods = clazz.getDeclaredMethods();
+            System.out.println("findSubscriber() " + clazz.getSimpleName()
+                    + " has " + allMethods.length + " methods");
             for (final Method method : allMethods) {
                 if (isAnnotatedMethod(method, annotation)) {
-                    methods.add(method);
+                    subscribers.add(new Subscriber(method, target));
                 }
             }
             // search more methods in super class
             clazz = clazz.getSuperclass();
         }
-        return methods;
+        return subscribers;
     }
 
     public static void dumpMethod(final Method method) {
