@@ -4,9 +4,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import com.mcxiaoke.bus.Bus;
-import com.mcxiaoke.bus.annotation.BusReceiver;
 import com.mcxiaoke.bus.Bus.EventMode;
+import com.mcxiaoke.bus.annotation.BusReceiver;
 
+import java.io.Serializable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,25 +24,39 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_main);
+        Bus.getDefault().setDebug(true);
         Bus.getDefault().register(this);
         final ExecutorService executor = Executors.newCachedThreadPool();
-        for (int j = 0; j < 5; j++) {
+        for (int j = 0; j < 1; j++) {
             final int index = j;
             final Runnable runnable = new Runnable() {
 
                 @BusReceiver(mode = EventMode.Main)
-                public void mainEvent1(final Object event) {
-                    Log.v(TAG, "mainEvent1 event=" + event
+                public void innerEvent(final String event) {
+                    Log.v(TAG, "innerEvent event=" + event
                             + " thread=" + Thread.currentThread().getName());
                 }
 
                 @Override
                 public void run() {
+                    long start = System.nanoTime();
+                    Log.d(TAG, "post() start");
                     for (int i = 0; i < 5; i++) {
-                        Bus.getDefault().register(this);
-                        Bus.getDefault().post("Event " + i + " j=" + index);
-                        Bus.getDefault().unregister(this);
+//                        Bus.getDefault().register(this);
+                        Bus.getDefault().post(new StringBuilder("Event " + i + " j=" + index));
+                        Bus.getDefault().post(new RuntimeException("ErrorEvent"));
+                        Bus.getDefault().post(new Runnable() {
+                            @Override
+                            public void run() {
+
+                            }
+                        });
+                        Bus.getDefault().post("Hello, Event!");
+                        Bus.getDefault().post(new Object());
+//                        Bus.getDefault().unregister(this);
                     }
+                    long end = System.nanoTime();
+                    Log.d(TAG, "post() elapsed time=" + (end - start) / 1000000);
                 }
             };
             executor.submit(runnable);
@@ -56,30 +71,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @BusReceiver(mode = EventMode.Main)
-    public void mainEvent(final Object event) {
+    public void onEvent(final Serializable event) {
         Log.v(TAG, "mainEvent event=" + event
                 + " thread=" + Thread.currentThread().getName());
     }
 
     @BusReceiver(mode = EventMode.Thread)
-    public void threadEvent(final Object event) {
+    public void threadEvent(final CharSequence event) {
         Log.v(TAG, "threadEvent event=" + event
                 + " thread=" + Thread.currentThread().getName());
     }
 
     @BusReceiver(mode = EventMode.Sender)
-    public void senderEvent(final Object event) {
+    public void senderEvent(final StringBuilder event) {
         Log.v(TAG, "senderEvent event=" + event
                 + " thread=" + Thread.currentThread().getName());
     }
 
     @BusReceiver
-    public void defaultEvent(final Object event) {
+    public void onEvent(final String event) {
         Log.v(TAG, "defaultEvent event=" + event
                 + " thread=" + Thread.currentThread().getName());
     }
 
-    public void onEvent(final Object event) {
+    public void onEvent(final Integer event) {
         Log.v(TAG, "onEvent event=" + event
                 + " thread=" + Thread.currentThread().getName());
     }
