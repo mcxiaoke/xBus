@@ -15,6 +15,6 @@ public class AnnotationMethodFinder implements MethodFinder {
 
     @Override
     public Set<MethodInfo> find(final Bus bus, final Class<?> targetClass) {
-        return MethodHelper.findSubscriberMethodsByAnnotation(targetClass, bus.isStrictMode());
+        return MethodHelper.findSubscriberMethodsByAnnotation(targetClass);
     }
 }

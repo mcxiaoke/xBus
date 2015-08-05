@@ -32,6 +32,6 @@ public class NamedMethodFinder implements MethodFinder {
 
     @Override
     public Set<MethodInfo> find(final Bus bus, final Class<?> targetClass) {
-        return MethodHelper.findSubscriberMethodsByName(targetClass, name, bus.isStrictMode());
+        return MethodHelper.findSubscriberMethodsByName(targetClass, name);
     }
 }

@@ -8,7 +8,7 @@ import android.util.Log;
  * Time: 15:42
  */
 public class EventEmitter implements Runnable {
-    private static final String TAG = EventEmitter.class.getSimpleName();
+    private static final String TAG = Bus.TAG;
 
     public final Bus bus;
     public final Object event;
@@ -31,13 +31,14 @@ public class EventEmitter implements Runnable {
         try {
             if (debug) {
                 Log.v(TAG, "sending event:[" + event
-                        + "] to subscriber:[" + subscriber + "]");
+                        + "] to subscriber:[" + subscriber
+                        + "] at thread:" + Thread.currentThread().getName());
             }
             subscriber.invoke(event);
         } catch (Exception e) {
             if (debug) {
-                Log.e(TAG, "sending event:" + event + " failed for " + e);
-                e.printStackTrace();
+                Log.e(TAG, "sending event:[" + event + "] to subscriber:["
+                        + subscriber + "] failed, reason: " + e, e);
             }
 //            bus.post(new BusException("sending event:[" + event
 //                    + "] to subscriber:[" + subscriber + "] failed", e));
@@ -48,7 +49,7 @@ public class EventEmitter implements Runnable {
     public String toString() {
         return "{" +
                 "event:[" + event +
-                "], subscriber:[" + subscriber +
+                "] to subscriber:[" + subscriber +
                 "]}";
     }
 }

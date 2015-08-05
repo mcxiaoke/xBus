@@ -48,8 +48,7 @@ public class Bus {
         return SingletonHolder.INSTANCE;
     }
 
-    private static final String TAG = Bus.class.getSimpleName();
-    private static final boolean DEBUG = BuildConfig.DEBUG;
+    public static final String TAG = Bus.class.getSimpleName();
 
     // key=注册类的对象
     // value=注册类包含的事件类型集合
@@ -66,7 +65,6 @@ public class Bus {
     private Scheduler mSenderScheduler;
     private Scheduler mThreadScheduler;
 
-    private volatile boolean mStrictMode;
     private volatile boolean mDebug;
 
     private Bus() {
@@ -76,15 +74,6 @@ public class Bus {
         mMainScheduler = Schedulers.main(this);
         mSenderScheduler = Schedulers.sender(this);
         mThreadScheduler = Schedulers.thread(this);
-    }
-
-    public boolean isStrictMode() {
-        return mStrictMode;
-    }
-
-    public Bus setStrictMode(final boolean strictMode) {
-        mStrictMode = strictMode;
-        return this;
     }
 
     public Bus setDebug(final boolean debug) {
@@ -140,14 +129,14 @@ public class Bus {
 
     public <T> void register(final T target) {
         if (mDebug) {
-            Log.v(TAG, "register() target=" + target);
+            Log.v(TAG, "register() target:[" + target + "]");
         }
         addSubscribers(target);
     }
 
     public <T> void unregister(final T target) {
         if (mDebug) {
-            Log.v(TAG, "unregister() target=" + target);
+            Log.v(TAG, "unregister() target:" + target);
         }
         final Set<Class<?>> eventTypes = mEventMap.remove(target);
         for (Class<?> eventType : eventTypes) {
@@ -171,7 +160,8 @@ public class Bus {
     public <E> void post(E event) {
         final Class<?> theEventType = event.getClass();
         if (mDebug) {
-            Log.v(TAG, "post() event:" + event + " type:" + theEventType.getSimpleName());
+            Log.v(TAG, "post() event:" + event + " type:"
+                    + theEventType.getSimpleName());
         }
         final String cacheKey = theEventType.getName();
         Set<Class<?>> eventTypes = Cache.sEventTypeCache.get(cacheKey);
@@ -194,7 +184,7 @@ public class Bus {
 
     public void sendEvent(EventEmitter emitter) {
         if (mDebug) {
-            Log.v(TAG, "sendEvent() " + emitter);
+            Log.v(TAG, "send event:" + emitter);
         }
         if (EventMode.Sender.equals(emitter.mode)) {
             mSenderScheduler.post(emitter);

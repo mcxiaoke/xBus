@@ -27,31 +27,21 @@ public class MethodHelper {
                 || clsName.startsWith("com.android.");
     }
 
-    public static boolean isValidMethod(final Method method, boolean strictMode) {
-        // allow non-public method here
-//        if (!Modifier.isPublic(method.getModifiers())) {
-//            return false;
-//        }
-        // must not static
+    public static boolean isValidMethod(final Method method) {
+        // method must be public
+        if (!Modifier.isPublic(method.getModifiers())) {
+            throw new BusException("event method: " + getMethodSignature(method)
+                    + " must be public!");
+        }
+        // method must not static
         if (Modifier.isStatic(method.getModifiers())) {
-            if (strictMode) {
-                throw new BusException("event method: " + getMethodSignature(method) +
-                        " must not be static!");
-            }
-            return false;
+            throw new BusException("event method: " + getMethodSignature(method) +
+                    " must not be static!");
         }
-        // must not be private
-        if (Modifier.isPrivate(method.getModifiers())) {
-            if (strictMode) {
-                throw new BusException("event method: " + getMethodSignature(method)
-                        + " must not be private!");
-            }
-            return false;
-        }
-        // must has only one parameter
+        // method must has exact one parameter
         if (method.getParameterTypes().length != 1) {
             throw new BusException("event method: " + getMethodSignature(method)
-                    + " must have exactly one parameter!");
+                    + " must have exact one parameter!");
         }
         // must not be volatile
         // fix getDeclaredMethods bug, if method in base class,
@@ -81,7 +71,7 @@ public class MethodHelper {
     }
 
     public static Set<MethodInfo> findSubscriberMethodsByAnnotation(
-            final Class<?> targetClass, final boolean strictMode) {
+            final Class<?> targetClass) {
         final MethodConverter converter = new MethodConverter() {
             @Override
             public MethodInfo convert(final Method method) {
@@ -89,7 +79,7 @@ public class MethodHelper {
                 if (!method.isAnnotationPresent(BusReceiver.class)) {
                     return null;
                 }
-                if (!isValidMethod(method, strictMode)) {
+                if (!isValidMethod(method)) {
                     return null;
                 }
                 BusReceiver annotation = method.getAnnotation(BusReceiver.class);
@@ -100,7 +90,7 @@ public class MethodHelper {
     }
 
     public static Set<MethodInfo> findSubscriberMethodsByName(
-            final Class<?> targetClass, final String name, final boolean strictMode) {
+            final Class<?> targetClass, final String name) {
         final MethodConverter converter = new MethodConverter() {
             @Override
             public MethodInfo convert(final Method method) {
@@ -108,7 +98,7 @@ public class MethodHelper {
                 if (!name.equals(method.getName())) {
                     return null;
                 }
-                if (!isValidMethod(method, strictMode)) {
+                if (!isValidMethod(method)) {
                     return null;
                 }
                 return new MethodInfo(method, targetClass, EventMode.Main);
