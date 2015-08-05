@@ -10,11 +10,11 @@ import java.util.concurrent.Executors;
  * Date: 15/8/4
  * Time: 16:04
  */
-class AsyncScheduler implements Scheduler {
+class ExecutorScheduler implements Scheduler {
     private Bus mBus;
     private ExecutorService mExecutor;
 
-    public AsyncScheduler(final Bus bus) {
+    public ExecutorScheduler(final Bus bus) {
         mBus = bus;
         mExecutor = Executors.newCachedThreadPool();
     }

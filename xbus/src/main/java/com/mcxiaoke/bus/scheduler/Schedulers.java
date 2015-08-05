@@ -19,6 +19,6 @@ public final class Schedulers {
     }
 
     public static Scheduler thread(final Bus bus) {
-        return new AsyncScheduler(bus);
+        return new ExecutorScheduler(bus);
     }
 }

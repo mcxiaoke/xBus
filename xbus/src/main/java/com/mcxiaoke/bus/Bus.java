@@ -114,12 +114,12 @@ public class Bus {
         }
     }
 
-    public void register(final Object target) {
+    public <T> void register(final T target) {
         Log.v(TAG, "register() target=" + target);
         addSubscribers(target);
     }
 
-    public void unregister(final Object target) {
+    public <T> void unregister(final T target) {
         Log.v(TAG, "unregister() target=" + target);
         final Set<Class<?>> eventTypes = mEventMap.remove(target);
         for (Class<?> eventType : eventTypes) {
@@ -138,7 +138,7 @@ public class Bus {
         }
     }
 
-    public void post(Object event) {
+    public <E> void post(E event) {
         final Class<?> theEventType = event.getClass();
         final String cacheKey = theEventType.getName();
         Set<Class<?>> eventTypes = Cache.sEventTypeCache.get(cacheKey);
@@ -161,7 +161,7 @@ public class Bus {
         }
     }
 
-    public void sendEvent(final Object event, Subscriber subscriber) {
+    public <E> void sendEvent(final E event, Subscriber subscriber) {
         Log.v(TAG, "sendEvent event=" + event + " subscriber=" + subscriber);
         final EventEmitter emitter = new EventEmitter(event, subscriber);
         if (EventMode.Sender.equals(subscriber.mode)) {
