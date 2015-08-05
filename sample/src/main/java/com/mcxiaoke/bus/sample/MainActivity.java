@@ -4,8 +4,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import com.mcxiaoke.bus.Bus;
-import com.mcxiaoke.bus.BusReceiver;
-import com.mcxiaoke.bus.EventMode;
+import com.mcxiaoke.bus.annotation.BusReceiver;
+import com.mcxiaoke.bus.Bus.EventMode;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
