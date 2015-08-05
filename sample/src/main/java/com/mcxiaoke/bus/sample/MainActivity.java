@@ -24,39 +24,40 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_main);
-        Bus.getDefault().setDebug(true).setStrictMode(true);
+        Bus.getDefault().setDebug(true);
         Bus.getDefault().register(this);
         final ExecutorService executor = Executors.newCachedThreadPool();
-        for (int j = 0; j < 1; j++) {
-            final int index = j;
+        for (int j = 0; j < 5; j++) {
             final Runnable runnable = new Runnable() {
 
                 @BusReceiver(mode = EventMode.Main)
-                public void innerEvent(final String event) {
+                public void innerEvent(final Appendable event) {
                     Log.v(TAG, "innerEvent event=" + event
                             + " thread=" + Thread.currentThread().getName());
                 }
 
                 @Override
                 public void run() {
+                    Bus.getDefault().register(this);
                     long start = System.nanoTime();
                     Log.d(TAG, "post() start");
                     for (int i = 0; i < 5; i++) {
 //                        Bus.getDefault().register(this);
-                        Bus.getDefault().post(new StringBuilder("Event " + i + " j=" + index));
-                        Bus.getDefault().post(new RuntimeException("ErrorEvent"));
-                        Bus.getDefault().post(new Runnable() {
-                            @Override
-                            public void run() {
-
-                            }
-                        });
-                        Bus.getDefault().post("Hello, Event!");
-                        Bus.getDefault().post(new Object());
+                        Bus.getDefault().post(new StringBuilder("SomeEvent" + i));
+//                        Bus.getDefault().post(new RuntimeException("ErrorEvent"));
+//                        Bus.getDefault().post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//
+//                            }
+//                        });
+//                        Bus.getDefault().post("Hello, Event!");
+//                        Bus.getDefault().post(new Object());
 //                        Bus.getDefault().unregister(this);
                     }
                     long end = System.nanoTime();
                     Log.d(TAG, "post() elapsed time=" + (end - start) / 1000000);
+                    Bus.getDefault().unregister(this);
                 }
             };
             executor.submit(runnable);
@@ -68,6 +69,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Bus.getDefault().unregister(this);
+    }
+
+    @BusReceiver(mode = EventMode.Sender)
+    public void senderEvent(final Serializable event) {
+        Log.v(TAG, "senderEvent event=" + event
+                + " thread=" + Thread.currentThread().getName());
     }
 
     @BusReceiver(mode = EventMode.Main)
@@ -82,20 +89,20 @@ public class MainActivity extends AppCompatActivity {
                 + " thread=" + Thread.currentThread().getName());
     }
 
-    @BusReceiver(mode = EventMode.Sender)
-    public void senderEvent(final StringBuilder event) {
+    public void onEvent(final Integer event) {
+        Log.v(TAG, "onEvent event=" + event
+                + " thread=" + Thread.currentThread().getName());
+    }
+
+    //@BusReceiver(mode = EventMode.Sender)
+    protected void protectedMethod(final StringBuilder event) {
         Log.v(TAG, "senderEvent event=" + event
                 + " thread=" + Thread.currentThread().getName());
     }
 
-    @BusReceiver
-    public void onEvent(final String event) {
+    //@BusReceiver
+    void defaultMethod(final String event) {
         Log.v(TAG, "defaultEvent event=" + event
-                + " thread=" + Thread.currentThread().getName());
-    }
-
-    public void onEvent(final Integer event) {
-        Log.v(TAG, "onEvent event=" + event
                 + " thread=" + Thread.currentThread().getName());
     }
 
