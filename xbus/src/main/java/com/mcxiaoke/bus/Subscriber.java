@@ -5,12 +5,12 @@ package com.mcxiaoke.bus;
  * Date: 15/8/4
  * Time: 15:43
  */
-public class Subscriber {
+class Subscriber {
     public final MethodInfo method;
     public final Object target;
     public final Class<?> targetType;
     public final Class<?> eventType;
-    public final EventMode mode;
+    public final Bus.EventMode mode;
     public final String name;
 
     public Subscriber(final MethodInfo method, final Object target) {

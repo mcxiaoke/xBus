@@ -12,9 +12,9 @@ public class MethodInfo {
     public final Class<?> targetType;
     public final Class<?> eventType;
     public final String name;
-    public final EventMode mode;
+    public final Bus.EventMode mode;
 
-    public MethodInfo(final Method method, final Class<?> targetClass, final EventMode mode) {
+    public MethodInfo(final Method method, final Class<?> targetClass, final Bus.EventMode mode) {
         this.method = method;
         this.targetType = targetClass;
         this.eventType = method.getParameterTypes()[0];

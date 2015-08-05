@@ -30,7 +30,7 @@ public class NamedMethodFinder implements MethodFinder {
     }
 
     @Override
-    public Set<MethodInfo> findSubscriberMethods(final Class<?> targetClass) {
+    public Set<MethodInfo> find(final Class<?> targetClass) {
         return MethodHelper.findSubscriberMethodsByName(targetClass, name);
     }
 }

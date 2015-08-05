@@ -11,5 +11,5 @@ import java.util.Set;
  */
 public interface MethodFinder {
 
-    Set<MethodInfo> findSubscriberMethods(final Class<?> targetClass);
+    Set<MethodInfo> find(final Class<?> targetClass);
 }

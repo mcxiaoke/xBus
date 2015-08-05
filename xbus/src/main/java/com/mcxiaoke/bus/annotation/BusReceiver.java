@@ -1,4 +1,6 @@
-package com.mcxiaoke.bus;
+package com.mcxiaoke.bus.annotation;
+
+import com.mcxiaoke.bus.Bus;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,5 +16,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface BusReceiver {
 
-    EventMode mode() default EventMode.Main;
+    Bus.EventMode mode() default Bus.EventMode.Main;
 }

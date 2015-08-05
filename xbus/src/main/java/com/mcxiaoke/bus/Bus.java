@@ -19,6 +19,27 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Bus {
 
+    public enum EventMode {
+
+        Sender, Main, Thread
+    }
+
+    static class Cache {
+
+        // key=注册类的完整类名 target.getClass().getName()
+        // value=注册类包含的合法的@BusReceiver方法对象集合
+        // targetTypeName->method set
+        final static Map<String, Set<MethodInfo>> sMethodCache =
+                new ConcurrentHashMap<String, Set<MethodInfo>>();
+        // key=事件类型的完整类名
+        // value=事件类型的所有父类和接口
+        // eventTypeName-> event type set
+        final static Map<String, Set<Class<?>>> sEventTypeCache =
+                new ConcurrentHashMap<String, Set<Class<?>>>();
+
+
+    }
+
     private static class SingletonHolder {
         static final Bus INSTANCE = new Bus();
     }
@@ -30,14 +51,6 @@ public class Bus {
     private static final String TAG = Bus.class.getSimpleName();
     private static final boolean DEBUG = BuildConfig.DEBUG;
 
-    // key=注册类的完整类名 target.getClass().getName()
-    // value=注册类包含的合法的@BusReceiver方法对象集合
-    // targetTypeName->method set
-    private final Map<String, Set<MethodInfo>> mMethodCache;
-    // key=事件类型的完整类名
-    // value=事件类型的所有父类和接口
-    // eventTypeName-> event type set
-    private final Map<String, Set<Class<?>>> mEventTypeCache;
     // key=注册类的对象
     // value=注册类包含的事件类型集合
     // target->eventType set
@@ -54,8 +67,6 @@ public class Bus {
     private Scheduler mThreadScheduler;
 
     private Bus() {
-        mMethodCache = new ConcurrentHashMap<String, Set<MethodInfo>>();
-        mEventTypeCache = new ConcurrentHashMap<String, Set<Class<?>>>();
         mEventMap = new ConcurrentHashMap<Object, Set<Class<?>>>();
         mSubscriberMap = new ConcurrentHashMap<Class<?>, Set<Subscriber>>();
         mMethodFinder = new AnnotationMethodFinder();
@@ -74,10 +85,12 @@ public class Bus {
 
     private Set<MethodInfo> getMethods(Class<?> targetClass) {
         String cacheKey = targetClass.getName();
-        Set<MethodInfo> methods = mMethodCache.get(cacheKey);
+        Set<MethodInfo> methods = Cache.sMethodCache.get(cacheKey);
         if (methods == null) {
-            methods = mMethodFinder.findSubscriberMethods(targetClass);
-            mMethodCache.put(cacheKey, methods);
+            methods = mMethodFinder.find(targetClass);
+            synchronized (Cache.sMethodCache) {
+                Cache.sMethodCache.put(cacheKey, methods);
+            }
         }
         return methods;
     }
@@ -128,10 +141,12 @@ public class Bus {
     public void post(Object event) {
         final Class<?> theEventType = event.getClass();
         final String cacheKey = theEventType.getName();
-        Set<Class<?>> eventTypes = mEventTypeCache.get(cacheKey);
+        Set<Class<?>> eventTypes = Cache.sEventTypeCache.get(cacheKey);
         if (eventTypes == null) {
             eventTypes = Helper.findSuperTypes(theEventType);
-            mEventTypeCache.put(cacheKey, eventTypes);
+            synchronized (Cache.sEventTypeCache) {
+                Cache.sEventTypeCache.put(cacheKey, eventTypes);
+            }
         }
         for (Class<?> eventType : eventTypes) {
             final Set<Subscriber> subscribers = mSubscriberMap.get(eventType);
@@ -148,20 +163,24 @@ public class Bus {
 
     public void sendEvent(final Object event, Subscriber subscriber) {
         Log.v(TAG, "sendEvent event=" + event + " subscriber=" + subscriber);
-        final EventSender sender = new EventSender(event, subscriber);
+        final EventEmitter emitter = new EventEmitter(event, subscriber);
         if (EventMode.Sender.equals(subscriber.mode)) {
-            mSenderScheduler.post(sender);
+            mSenderScheduler.post(emitter);
         } else if (EventMode.Main.equals(subscriber.mode)) {
-            mMainScheduler.post(sender);
+            if (Helper.isMainThread()) {
+                mSenderScheduler.post(emitter);
+            } else {
+                mMainScheduler.post(emitter);
+            }
         } else if (EventMode.Thread.equals(subscriber.mode)) {
-            mThreadScheduler.post(sender);
+            mThreadScheduler.post(emitter);
         }
     }
 
     // for debug only
     public void reset() {
-        mMethodCache.clear();
-        mEventTypeCache.clear();
+        Cache.sMethodCache.clear();
+        Cache.sEventTypeCache.clear();
         mEventMap.clear();
         mSubscriberMap.clear();
     }

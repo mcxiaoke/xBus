@@ -1,5 +1,7 @@
 package com.mcxiaoke.bus;
 
+import android.os.Looper;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -30,6 +32,10 @@ final class Helper {
             clazz = clazz.getSuperclass();
         }
         return classes;
+    }
+
+    public static boolean isMainThread() {
+        return Looper.myLooper() == Looper.getMainLooper();
     }
 
     public static void dumpMethod(final Method method) {

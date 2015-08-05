@@ -1,7 +1,7 @@
 package com.mcxiaoke.bus.method;
 
-import com.mcxiaoke.bus.BusReceiver;
-import com.mcxiaoke.bus.EventMode;
+import com.mcxiaoke.bus.annotation.BusReceiver;
+import com.mcxiaoke.bus.Bus.EventMode;
 import com.mcxiaoke.bus.MethodInfo;
 
 import java.lang.reflect.Method;
