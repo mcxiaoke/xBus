@@ -1,8 +1,9 @@
 package com.mcxiaoke.bus.method;
 
-import com.mcxiaoke.bus.annotation.BusReceiver;
 import com.mcxiaoke.bus.Bus.EventMode;
 import com.mcxiaoke.bus.MethodInfo;
+import com.mcxiaoke.bus.annotation.BusReceiver;
+import com.mcxiaoke.bus.exception.BusException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -15,6 +16,8 @@ import java.util.Set;
  * Time: 18:16
  */
 public class MethodHelper {
+
+
     public static boolean shouldSkipClass(final Class<?> clazz) {
         final String clsName = clazz.getName();
         return Object.class.equals(clazz)
@@ -24,31 +27,37 @@ public class MethodHelper {
                 || clsName.startsWith("com.android.");
     }
 
-    public static boolean isValidMethod(final Method method) {
+    public static boolean isValidMethod(final Method method, boolean strictMode) {
+        // allow non-public method here
 //        if (!Modifier.isPublic(method.getModifiers())) {
 //            return false;
 //        }
         // must not static
         if (Modifier.isStatic(method.getModifiers())) {
+            if (strictMode) {
+                throw new BusException("event method: " + getMethodSignature(method) +
+                        " must not be static!");
+            }
             return false;
         }
         // must not be private
         if (Modifier.isPrivate(method.getModifiers())) {
+            if (strictMode) {
+                throw new BusException("event method: " + getMethodSignature(method)
+                        + " must not be private!");
+            }
             return false;
+        }
+        // must has only one parameter
+        if (method.getParameterTypes().length != 1) {
+            throw new BusException("event method: " + getMethodSignature(method)
+                    + " must have exactly one parameter!");
         }
         // must not be volatile
         // fix getDeclaredMethods bug, if method in base class,
         // it returns duplicate method,
         // one is normal, the other is the same but with volatile modifier
-        if (Modifier.isVolatile(method.getModifiers())) {
-            return false;
-        }
-        // must has only one parameter
-        if (method.getParameterTypes().length != 1) {
-            return false;
-        }
-
-        return true;
+        return !Modifier.isVolatile(method.getModifiers());
     }
 
     public static Set<MethodInfo> findSubscriberMethods(
@@ -72,7 +81,7 @@ public class MethodHelper {
     }
 
     public static Set<MethodInfo> findSubscriberMethodsByAnnotation(
-            final Class<?> targetClass) {
+            final Class<?> targetClass, final boolean strictMode) {
         final MethodConverter converter = new MethodConverter() {
             @Override
             public MethodInfo convert(final Method method) {
@@ -80,7 +89,7 @@ public class MethodHelper {
                 if (!method.isAnnotationPresent(BusReceiver.class)) {
                     return null;
                 }
-                if (!isValidMethod(method)) {
+                if (!isValidMethod(method, strictMode)) {
                     return null;
                 }
                 BusReceiver annotation = method.getAnnotation(BusReceiver.class);
@@ -91,7 +100,7 @@ public class MethodHelper {
     }
 
     public static Set<MethodInfo> findSubscriberMethodsByName(
-            final Class<?> targetClass, final String name) {
+            final Class<?> targetClass, final String name, final boolean strictMode) {
         final MethodConverter converter = new MethodConverter() {
             @Override
             public MethodInfo convert(final Method method) {
@@ -99,12 +108,16 @@ public class MethodHelper {
                 if (!name.equals(method.getName())) {
                     return null;
                 }
-                if (!isValidMethod(method)) {
+                if (!isValidMethod(method, strictMode)) {
                     return null;
                 }
                 return new MethodInfo(method, targetClass, EventMode.Main);
             }
         };
         return findSubscriberMethods(targetClass, converter);
+    }
+
+    private static String getMethodSignature(final Method method) {
+        return method.getDeclaringClass().getSimpleName() + "." + method.getName() + "()";
     }
 }

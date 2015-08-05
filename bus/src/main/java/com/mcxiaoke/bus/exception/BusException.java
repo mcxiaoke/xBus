@@ -5,7 +5,7 @@ package com.mcxiaoke.bus.exception;
  * Date: 15/8/5
  * Time: 16:33
  */
-public class BusException extends Exception {
+public class BusException extends RuntimeException {
 
     public BusException(final String detailMessage) {
         super(detailMessage);

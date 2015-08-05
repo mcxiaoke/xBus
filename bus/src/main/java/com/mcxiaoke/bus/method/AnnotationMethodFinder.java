@@ -1,5 +1,6 @@
 package com.mcxiaoke.bus.method;
 
+import com.mcxiaoke.bus.Bus;
 import com.mcxiaoke.bus.MethodInfo;
 
 import java.util.Set;
@@ -13,7 +14,7 @@ public class AnnotationMethodFinder implements MethodFinder {
 
 
     @Override
-    public Set<MethodInfo> find(final Class<?> targetClass) {
-        return MethodHelper.findSubscriberMethodsByAnnotation(targetClass);
+    public Set<MethodInfo> find(final Bus bus, final Class<?> targetClass) {
+        return MethodHelper.findSubscriberMethodsByAnnotation(targetClass, bus.isStrictMode());
     }
 }

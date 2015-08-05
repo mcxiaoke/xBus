@@ -65,6 +65,8 @@ public class Bus {
     private Scheduler mMainScheduler;
     private Scheduler mSenderScheduler;
     private Scheduler mThreadScheduler;
+
+    private volatile boolean mStrictMode;
     private volatile boolean mDebug;
 
     private Bus() {
@@ -74,6 +76,15 @@ public class Bus {
         mMainScheduler = Schedulers.main(this);
         mSenderScheduler = Schedulers.sender(this);
         mThreadScheduler = Schedulers.thread(this);
+    }
+
+    public boolean isStrictMode() {
+        return mStrictMode;
+    }
+
+    public Bus setStrictMode(final boolean strictMode) {
+        mStrictMode = strictMode;
+        return this;
     }
 
     public Bus setDebug(final boolean debug) {
@@ -94,7 +105,7 @@ public class Bus {
         String cacheKey = targetClass.getName();
         Set<MethodInfo> methods = Cache.sMethodCache.get(cacheKey);
         if (methods == null) {
-            methods = mMethodFinder.find(targetClass);
+            methods = mMethodFinder.find(this, targetClass);
             synchronized (Cache.sMethodCache) {
                 Cache.sMethodCache.put(cacheKey, methods);
             }
@@ -150,7 +161,7 @@ public class Bus {
                 if (subscriber.target == target) {
                     it.remove();
                     if (mDebug) {
-                        Log.v(TAG, "unregister() remove " + subscriber);
+                        Log.v(TAG, "unregister() remove subscriber:" + subscriber);
                     }
                 }
             }

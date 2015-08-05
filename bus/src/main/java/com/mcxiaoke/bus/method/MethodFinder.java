@@ -1,5 +1,6 @@
 package com.mcxiaoke.bus.method;
 
+import com.mcxiaoke.bus.Bus;
 import com.mcxiaoke.bus.MethodInfo;
 
 import java.util.Set;
@@ -11,5 +12,5 @@ import java.util.Set;
  */
 public interface MethodFinder {
 
-    Set<MethodInfo> find(final Class<?> targetClass);
+    Set<MethodInfo> find(final Bus bus, final Class<?> targetClass);
 }

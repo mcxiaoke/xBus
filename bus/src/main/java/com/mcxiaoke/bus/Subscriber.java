@@ -38,7 +38,7 @@ class Subscriber {
         return targetType.getSimpleName() + "."
                 + method.method.getName()
                 + "(" + eventType.getSimpleName() + ")"
-                + "-" + method.mode.name();
+                + ":" + method.mode.name();
     }
 
 
