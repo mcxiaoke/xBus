@@ -2,7 +2,8 @@ apply plugin: 'com.android.application'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(":xbus")
+    compile project(":bus")
+    compile project(":async")
     compile 'com.jakewharton:butterknife:7.0.0'
     compile 'com.android.support:support-v4:22.2.0'
     compile 'com.android.support:appcompat-v7:22.2.0'
