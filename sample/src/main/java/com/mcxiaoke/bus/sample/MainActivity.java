@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_main);
-        Bus.getDefault().setDebug(true);
+        Bus.getDefault().setDebug(true).setStrictMode(true);
         Bus.getDefault().register(this);
         final ExecutorService executor = Executors.newCachedThreadPool();
         for (int j = 0; j < 1; j++) {
@@ -96,6 +96,30 @@ public class MainActivity extends AppCompatActivity {
 
     public void onEvent(final Integer event) {
         Log.v(TAG, "onEvent event=" + event
+                + " thread=" + Thread.currentThread().getName());
+    }
+
+    //@BusReceiver
+    private void privateMethod(final CharSequence event) {
+        Log.v(TAG, "onEvent event=" + event
+                + " thread=" + Thread.currentThread().getName());
+    }
+
+    //@BusReceiver
+    public static void staticMethod(final CharSequence event) {
+        Log.v(TAG, "onEvent event=" + event
+                + " thread=" + Thread.currentThread().getName());
+    }
+
+    //@BusReceiver
+    public void twoParametersMethod(final CharSequence event, final Object object) {
+        Log.v(TAG, "onEvent event=" + event
+                + " thread=" + Thread.currentThread().getName());
+    }
+
+    //@BusReceiver
+    public void noParameterMethod() {
+        Log.v(TAG, "onEvent event=" + null
                 + " thread=" + Thread.currentThread().getName());
     }
 }
