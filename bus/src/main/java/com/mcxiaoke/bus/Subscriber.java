@@ -1,5 +1,7 @@
 package com.mcxiaoke.bus;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * User: mcxiaoke
  * Date: 15/8/4
@@ -22,13 +24,9 @@ class Subscriber {
         this.name = method.name;
     }
 
-    public Object invoke(Object event) {
-        try {
-            return this.method.method.invoke(this.target, event);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+    public Object invoke(Object event)
+            throws InvocationTargetException, IllegalAccessException {
+        return this.method.method.invoke(this.target, event);
     }
 
     public boolean match(final Class<?> eventClass) {

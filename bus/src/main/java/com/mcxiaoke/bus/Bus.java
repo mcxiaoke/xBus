@@ -65,6 +65,7 @@ public class Bus {
     private Scheduler mMainScheduler;
     private Scheduler mSenderScheduler;
     private Scheduler mThreadScheduler;
+    private volatile boolean mDebug;
 
     private Bus() {
         mEventMap = new ConcurrentHashMap<Object, Set<Class<?>>>();
@@ -75,12 +76,18 @@ public class Bus {
         mThreadScheduler = Schedulers.thread(this);
     }
 
+    public Bus setDebug(final boolean debug) {
+        mDebug = debug;
+        return this;
+    }
+
     public MethodFinder getMethodFinder() {
         return mMethodFinder;
     }
 
-    public void setMethodFinder(final MethodFinder finder) {
+    public Bus setMethodFinder(final MethodFinder finder) {
         mMethodFinder = finder;
+        return this;
     }
 
     private Set<MethodInfo> getMethods(Class<?> targetClass) {
@@ -96,31 +103,41 @@ public class Bus {
     }
 
     private void addSubscribers(final Object target) {
+        // 建立target-->eventType的对应关系
+        // 每个target对象里可能有多个事件接收器方法，会订阅多个类型的event
+        Class<?> targetType = target.getClass();
         Set<Class<?>> eventTypes = mEventMap.get(target);
         if (eventTypes == null) {
             eventTypes = new HashSet<Class<?>>();
             mEventMap.put(target, eventTypes);
         }
-        Set<MethodInfo> methods = getMethods(target.getClass());
+        // 这里找出target里包含的所有事件接收器方法
+        Set<MethodInfo> methods = getMethods(targetType);
         for (MethodInfo method : methods) {
             final Subscriber subscriber = new Subscriber(method, target);
+            // 将eventType，也就是参数类型添加到target对应的eventType集合里
             eventTypes.add(subscriber.eventType);
             Set<Subscriber> ss = mSubscriberMap.get(subscriber.eventType);
             if (ss == null) {
                 ss = new HashSet<Subscriber>();
                 mSubscriberMap.put(subscriber.eventType, ss);
             }
+            // 将subscriber添加到eventType对应的订阅者集合里
             ss.add(subscriber);
         }
     }
 
     public <T> void register(final T target) {
-        Log.v(TAG, "register() target=" + target);
+        if (mDebug) {
+            Log.v(TAG, "register() target=" + target);
+        }
         addSubscribers(target);
     }
 
     public <T> void unregister(final T target) {
-        Log.v(TAG, "unregister() target=" + target);
+        if (mDebug) {
+            Log.v(TAG, "unregister() target=" + target);
+        }
         final Set<Class<?>> eventTypes = mEventMap.remove(target);
         for (Class<?> eventType : eventTypes) {
             Set<Subscriber> subscribers = mSubscriberMap.get(eventType);
@@ -132,7 +149,9 @@ public class Bus {
                 final Subscriber subscriber = it.next();
                 if (subscriber.target == target) {
                     it.remove();
-                    Log.v(TAG, "unregister() remove " + subscriber);
+                    if (mDebug) {
+                        Log.v(TAG, "unregister() remove " + subscriber);
+                    }
                 }
             }
         }
@@ -140,6 +159,9 @@ public class Bus {
 
     public <E> void post(E event) {
         final Class<?> theEventType = event.getClass();
+        if (mDebug) {
+            Log.v(TAG, "post() event:" + event + " type:" + theEventType.getSimpleName());
+        }
         final String cacheKey = theEventType.getName();
         Set<Class<?>> eventTypes = Cache.sEventTypeCache.get(cacheKey);
         if (eventTypes == null) {
@@ -154,31 +176,33 @@ public class Bus {
                 continue;
             }
             for (Subscriber subscriber : subscribers) {
-                if (subscriber.match(eventType)) {
-                    sendEvent(event, subscriber);
-                }
+                sendEvent(new EventEmitter(this, event, subscriber, mDebug));
             }
         }
     }
 
-    public <E> void sendEvent(final E event, Subscriber subscriber) {
-        Log.v(TAG, "sendEvent event=" + event + " subscriber=" + subscriber);
-        final EventEmitter emitter = new EventEmitter(event, subscriber);
-        if (EventMode.Sender.equals(subscriber.mode)) {
+    public void sendEvent(EventEmitter emitter) {
+        if (mDebug) {
+            Log.v(TAG, "sendEvent() " + emitter);
+        }
+        if (EventMode.Sender.equals(emitter.mode)) {
             mSenderScheduler.post(emitter);
-        } else if (EventMode.Main.equals(subscriber.mode)) {
+        } else if (EventMode.Main.equals(emitter.mode)) {
             if (Helper.isMainThread()) {
                 mSenderScheduler.post(emitter);
             } else {
                 mMainScheduler.post(emitter);
             }
-        } else if (EventMode.Thread.equals(subscriber.mode)) {
+        } else if (EventMode.Thread.equals(emitter.mode)) {
             mThreadScheduler.post(emitter);
         }
     }
 
     // for debug only
     public void reset() {
+        if (mDebug) {
+            Log.v(TAG, "reset");
+        }
         Cache.sMethodCache.clear();
         Cache.sEventTypeCache.clear();
         mEventMap.clear();
