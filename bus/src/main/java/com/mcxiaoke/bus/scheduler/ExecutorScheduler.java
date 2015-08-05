@@ -2,7 +2,7 @@ package com.mcxiaoke.bus.scheduler;
 
 import com.mcxiaoke.bus.Bus;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**
@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
  */
 class ExecutorScheduler implements Scheduler {
     private Bus mBus;
-    private ExecutorService mExecutor;
+    private Executor mExecutor;
 
     public ExecutorScheduler(final Bus bus) {
         mBus = bus;

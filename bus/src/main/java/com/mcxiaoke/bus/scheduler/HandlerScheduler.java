@@ -13,9 +13,9 @@ class HandlerScheduler implements Scheduler {
     private Bus mBus;
     private Handler mHandler;
 
-    public HandlerScheduler(final Bus bus, final Looper looper) {
+    public HandlerScheduler(final Bus bus, final Handler handler) {
         mBus = bus;
-        mHandler = new Handler(looper);
+        mHandler = handler;
     }
 
     @Override

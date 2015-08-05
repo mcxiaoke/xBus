@@ -1,5 +1,6 @@
 package com.mcxiaoke.bus.scheduler;
 
+import android.os.Handler;
 import android.os.Looper;
 import com.mcxiaoke.bus.Bus;
 
@@ -15,7 +16,7 @@ public final class Schedulers {
     }
 
     public static Scheduler main(final Bus bus) {
-        return new HandlerScheduler(bus, Looper.getMainLooper());
+        return new HandlerScheduler(bus, new Handler(Looper.getMainLooper()));
     }
 
     public static Scheduler thread(final Bus bus) {
