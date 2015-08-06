@@ -9,7 +9,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.mcxiaoke.bus.Bus;
 import com.mcxiaoke.bus.Bus.EventMode;
-import com.mcxiaoke.bus.BusSendEvent;
 import com.mcxiaoke.bus.annotation.BusReceiver;
 
 import java.text.DateFormat;
@@ -81,11 +80,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Bus.getDefault().unregister(this);
-    }
-
-    @BusReceiver(mode = EventMode.Sender)
-    public void onBusSendEvent(final BusSendEvent event) {
-        Log.v(TAG, "onBusSendEvent=" + Thread.currentThread().getName());
     }
 
     @BusReceiver(mode = EventMode.Sender)
