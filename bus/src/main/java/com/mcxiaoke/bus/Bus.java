@@ -94,7 +94,10 @@ public class Bus {
 
     private Set<MethodInfo> getMethods(Class<?> targetClass) {
         String cacheKey = targetClass.getName();
-        Set<MethodInfo> methods = Cache.sMethodCache.get(cacheKey);
+        Set<MethodInfo> methods;
+        synchronized (Cache.sMethodCache) {
+            methods = Cache.sMethodCache.get(cacheKey);
+        }
         if (methods == null) {
             methods = mMethodFinder.find(this, targetClass);
             synchronized (Cache.sMethodCache) {
@@ -170,7 +173,10 @@ public class Bus {
                     + theEventType.getSimpleName());
         }
         final String cacheKey = theEventType.getName();
-        Set<Class<?>> eventTypes = Cache.sEventTypeCache.get(cacheKey);
+        Set<Class<?>> eventTypes;
+        synchronized (Cache.sEventTypeCache) {
+            eventTypes = Cache.sEventTypeCache.get(cacheKey);
+        }
         if (eventTypes == null) {
             eventTypes = Helper.findSuperTypes(theEventType);
             synchronized (Cache.sEventTypeCache) {
