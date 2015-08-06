@@ -1,7 +1,5 @@
 package com.mcxiaoke.bus.annotation;
 
-import com.mcxiaoke.bus.Bus;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,16 +8,13 @@ import java.lang.annotation.Target;
 
 /**
  * User: mcxiaoke
- * Date: 15/7/30
- * Time: 18:12
- * 标识一个方法为事件接收器方法
- * 同时这个方法需要满足条件：
- * public/非static/一个参数/无返回值
+ * Date: 15/8/6
+ * Time: 11:33
+ *
+ * 标识一个类或接口为事件，暂未使用
  */
 @Documented
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface BusReceiver {
-
-    Bus.EventMode mode() default Bus.EventMode.Main;
+public @interface BusEvent {
 }

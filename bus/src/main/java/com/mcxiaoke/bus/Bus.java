@@ -82,10 +82,6 @@ public class Bus {
         return this;
     }
 
-    public MethodFinder getMethodFinder() {
-        return mMethodFinder;
-    }
-
     public Bus setMethodFinder(final MethodFinder finder) {
         mMethodFinder = finder;
         return this;
