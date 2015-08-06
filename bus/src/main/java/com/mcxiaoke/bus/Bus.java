@@ -54,11 +54,11 @@ public class Bus {
     // key=注册类的对象
     // value=注册类包含的事件类型集合
     // target->eventType set
-    private Map<Object, Set<Class<?>>> mEventMap;
+    private final Map<Object, Set<Class<?>>> mEventMap;
     // key=事件参数类型
     // value=事件参数所属的Subscriber对象集合
     // eventType->subscriber set
-    private Map<Class<?>, Set<Subscriber>> mSubscriberMap;
+    private final Map<Class<?>, Set<Subscriber>> mSubscriberMap;
 
     private MethodFinder mMethodFinder;
 
@@ -119,13 +119,15 @@ public class Bus {
             final Subscriber subscriber = new Subscriber(method, target);
             // 将eventType，也就是参数类型添加到target对应的eventType集合里
             eventTypes.add(subscriber.eventType);
-            Set<Subscriber> ss = mSubscriberMap.get(subscriber.eventType);
-            if (ss == null) {
-                ss = new HashSet<Subscriber>();
-                mSubscriberMap.put(subscriber.eventType, ss);
+            synchronized (mSubscriberMap) {
+                Set<Subscriber> ss = mSubscriberMap.get(subscriber.eventType);
+                if (ss == null) {
+                    ss = new HashSet<Subscriber>();
+                    mSubscriberMap.put(subscriber.eventType, ss);
+                }
+                // 将subscriber添加到eventType对应的订阅者集合里
+                ss.add(subscriber);
             }
-            // 将subscriber添加到eventType对应的订阅者集合里
-            ss.add(subscriber);
         }
     }
 
@@ -146,13 +148,15 @@ public class Bus {
             if (subscribers == null || subscribers.isEmpty()) {
                 continue;
             }
-            Iterator<Subscriber> it = subscribers.iterator();
-            while (it.hasNext()) {
-                final Subscriber subscriber = it.next();
-                if (subscriber.target == target) {
-                    it.remove();
-                    if (mDebug) {
-                        Log.v(TAG, "unregister() remove subscriber:" + subscriber);
+            synchronized (mSubscriberMap) {
+                Iterator<Subscriber> it = subscribers.iterator();
+                while (it.hasNext()) {
+                    final Subscriber subscriber = it.next();
+                    if (subscriber.target == target) {
+                        it.remove();
+                        if (mDebug) {
+                            Log.v(TAG, "unregister() remove subscriber:" + subscriber);
+                        }
                     }
                 }
             }
