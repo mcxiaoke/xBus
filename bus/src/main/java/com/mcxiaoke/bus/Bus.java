@@ -3,6 +3,7 @@ package com.mcxiaoke.bus;
 import android.util.Log;
 import com.mcxiaoke.bus.method.AnnotationMethodFinder;
 import com.mcxiaoke.bus.method.MethodFinder;
+import com.mcxiaoke.bus.method.NamedMethodFinder;
 import com.mcxiaoke.bus.scheduler.Scheduler;
 import com.mcxiaoke.bus.scheduler.Schedulers;
 
@@ -87,6 +88,11 @@ public class Bus {
 
     public Bus setMethodFinder(final MethodFinder finder) {
         mMethodFinder = finder;
+        return this;
+    }
+
+    public Bus setEventMethodName(final String methodName) {
+        mMethodFinder = new NamedMethodFinder(methodName);
         return this;
     }
 
