@@ -66,6 +66,7 @@ public class Bus {
     private Scheduler mSenderScheduler;
     private Scheduler mThreadScheduler;
 
+    private StopWatch mStopWatch;
     private volatile boolean mDebug;
 
     private Bus() {
@@ -75,6 +76,7 @@ public class Bus {
         mMainScheduler = Schedulers.main(this);
         mSenderScheduler = Schedulers.sender(this);
         mThreadScheduler = Schedulers.thread(this);
+        mStopWatch = new StopWatch(TAG);
     }
 
     public Bus setDebug(final boolean debug) {
@@ -137,13 +139,18 @@ public class Bus {
     public <T> void register(final T target) {
         if (mDebug) {
             Log.v(TAG, "register() target:[" + target + "]");
+            mStopWatch.start("register()");
         }
         addSubscribers(target);
+        if (mDebug) {
+            mStopWatch.stop("register()");
+        }
     }
 
     public <T> void unregister(final T target) {
         if (mDebug) {
             Log.v(TAG, "unregister() target:" + target);
+            mStopWatch.start("unregister()");
         }
         final Set<Class<?>> eventTypes = mEventMap.remove(target);
         for (Class<?> eventType : eventTypes) {
@@ -164,6 +171,9 @@ public class Bus {
                 }
             }
         }
+        if (mDebug) {
+            mStopWatch.stop("unregister()");
+        }
     }
 
     public <E> void post(E event) {
@@ -171,6 +181,7 @@ public class Bus {
         if (mDebug) {
             Log.v(TAG, "post() event:" + event + " type:"
                     + theEventType.getSimpleName());
+            mStopWatch.start("post() " + theEventType.getSimpleName());
         }
         final String cacheKey = theEventType.getName();
         Set<Class<?>> eventTypes;
@@ -191,6 +202,9 @@ public class Bus {
             for (Subscriber subscriber : subscribers) {
                 sendEvent(new EventEmitter(this, event, subscriber, mDebug));
             }
+        }
+        if (mDebug) {
+            mStopWatch.stop("post() " + theEventType.getSimpleName());
         }
     }
 
