@@ -3,7 +3,6 @@ package com.mcxiaoke.bus;
 import android.util.Log;
 import com.mcxiaoke.bus.method.AnnotationMethodFinder;
 import com.mcxiaoke.bus.method.MethodFinder;
-import com.mcxiaoke.bus.method.NamedMethodFinder;
 import com.mcxiaoke.bus.scheduler.Scheduler;
 import com.mcxiaoke.bus.scheduler.Schedulers;
 
@@ -59,8 +58,10 @@ public class Bus {
     // value=事件参数所属的Subscriber对象集合
     // eventType->subscriber set
     private final Map<Class<?>, Set<Subscriber>> mSubscriberMap;
+    private final Map<Class<?>, Object> mStickyEventMap;
 
     private MethodFinder mMethodFinder;
+    private boolean mStrictMode;
 
     private Scheduler mMainScheduler;
     private Scheduler mSenderScheduler;
@@ -72,7 +73,9 @@ public class Bus {
     private Bus() {
         mEventMap = new ConcurrentHashMap<Object, Set<Class<?>>>();
         mSubscriberMap = new ConcurrentHashMap<Class<?>, Set<Subscriber>>();
+        mStickyEventMap = new ConcurrentHashMap<Class<?>, Object>();
         mMethodFinder = new AnnotationMethodFinder();
+        mStrictMode = false;
         mMainScheduler = Schedulers.main(this);
         mSenderScheduler = Schedulers.sender(this);
         mThreadScheduler = Schedulers.thread(this);
@@ -89,9 +92,12 @@ public class Bus {
         return this;
     }
 
-    public Bus setEventMethodName(final String methodName) {
-        mMethodFinder = new NamedMethodFinder(methodName);
-        return this;
+    public void setStrictMode(final boolean strictMode) {
+        mStrictMode = strictMode;
+    }
+
+    public boolean isStrictMode() {
+        return mStrictMode;
     }
 
     private Set<MethodInfo> getMethods(Class<?> targetClass) {
@@ -124,15 +130,27 @@ public class Bus {
             final Subscriber subscriber = new Subscriber(method, target);
             // 将eventType，也就是参数类型添加到target对应的eventType集合里
             eventTypes.add(subscriber.eventType);
-            synchronized (mSubscriberMap) {
-                Set<Subscriber> ss = mSubscriberMap.get(subscriber.eventType);
-                if (ss == null) {
-                    ss = new HashSet<Subscriber>();
-                    mSubscriberMap.put(subscriber.eventType, ss);
-                }
-                // 将subscriber添加到eventType对应的订阅者集合里
-                ss.add(subscriber);
-            }
+            addSubscriber(subscriber);
+            checkStickyEvent(subscriber);
+        }
+    }
+
+    private synchronized void addSubscriber(final Subscriber subscriber) {
+        Set<Subscriber> ss = mSubscriberMap.get(subscriber.eventType);
+        if (ss == null) {
+            ss = new HashSet<Subscriber>();
+            mSubscriberMap.put(subscriber.eventType, ss);
+        }
+        // 将subscriber添加到eventType对应的订阅者集合里
+        ss.add(subscriber);
+    }
+
+    private void checkStickyEvent(final Subscriber subscriber) {
+        final Class<?> eventType = subscriber.eventType;
+        // one sticky event per once event type
+        final Object event = mStickyEventMap.get(eventType);
+        if (event != null) {
+            sendEvent(new EventEmitter(this, event, subscriber, mDebug));
         }
     }
 
@@ -176,6 +194,13 @@ public class Bus {
         }
     }
 
+    public <E> void postSticky(E event) {
+        post(event);
+        synchronized (mStickyEventMap) {
+            mStickyEventMap.put(event.getClass(), event);
+        }
+    }
+
     public <E> void post(E event) {
         final Class<?> theEventType = event.getClass();
         if (mDebug) {
@@ -183,6 +208,28 @@ public class Bus {
                     + theEventType.getSimpleName());
             mStopWatch.start("post() " + theEventType.getSimpleName());
         }
+        // strict mode, no subclass match
+        // rule: event.getClass().equals(parameterClass)
+        // parameterClass must be the same as event.getClass()
+        // eg.
+        // event type = String
+        // onEvent(Exception event) - not matched
+        // onEvent(String event) - matched
+        // onEvent(CharSequence event) - not matched
+        // onEvent(Object event) - not matched
+        if (mStrictMode) {
+            postEventByType(event, theEventType);
+            return;
+        }
+        // default policy, subclass match,eg.
+        // rule: parameterClass.isAssignableFrom(event.getClass())
+        // parameterClass must be super class or interface of event.getClass()
+        // eg.
+        // event type = String
+        // onEvent(Exception event) - not matched
+        // onEvent(String event) - matched
+        // onEvent(CharSequence event) - matched
+        // onEvent(Object event) - matched
         final String cacheKey = theEventType.getName();
         Set<Class<?>> eventTypes;
         synchronized (Cache.sEventTypeCache) {
@@ -190,21 +237,28 @@ public class Bus {
         }
         if (eventTypes == null) {
             eventTypes = Helper.findSuperTypes(theEventType);
+            if (mDebug) {
+                Log.v(TAG, "post() no event type cache, find types");
+            }
             synchronized (Cache.sEventTypeCache) {
                 Cache.sEventTypeCache.put(cacheKey, eventTypes);
             }
         }
         for (Class<?> eventType : eventTypes) {
-            final Set<Subscriber> subscribers = mSubscriberMap.get(eventType);
-            if (subscribers == null || subscribers.isEmpty()) {
-                continue;
-            }
-            for (Subscriber subscriber : subscribers) {
-                sendEvent(new EventEmitter(this, event, subscriber, mDebug));
-            }
+            postEventByType(event, eventType);
         }
         if (mDebug) {
             mStopWatch.stop("post() " + theEventType.getSimpleName());
+        }
+    }
+
+    private <E> void postEventByType(final E event, final Class<?> eventType) {
+        final Set<Subscriber> subscribers = mSubscriberMap.get(eventType);
+        if (subscribers == null || subscribers.isEmpty()) {
+            return;
+        }
+        for (Subscriber subscriber : subscribers) {
+            sendEvent(new EventEmitter(this, event, subscriber, mDebug));
         }
     }
 
