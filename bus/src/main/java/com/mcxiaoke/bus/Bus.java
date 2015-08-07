@@ -91,7 +91,7 @@ public class Bus {
 
     private volatile boolean mDebug;
 
-    private Bus() {
+    public Bus() {
         mEventMap = new ConcurrentHashMap<Object, Set<Class<?>>>();
         mSubscriberMap = new ConcurrentHashMap<Class<?>, Set<Subscriber>>();
         mStickyEventMap = new ConcurrentHashMap<Class<?>, Object>();
