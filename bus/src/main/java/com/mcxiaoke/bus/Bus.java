@@ -17,14 +17,26 @@ import java.util.concurrent.ConcurrentHashMap;
  * User: mcxiaoke
  * Date: 15/7/30
  * Time: 18:09
+ *
+ * Pub/Sub的事件总线
  */
 public class Bus {
 
+    /**
+     * 事件发送模式：
+     *
+     * Sender - 在发送者的线程调用@BusReceiver/onEvent方法
+     * Main - 在主线程调用@BusReceiver/onEvent方法（默认为次模式）
+     * Thread - 在一个单独的线程调用@BusReceiver/onEvent方法
+     */
     public enum EventMode {
 
         Sender, Main, Thread
     }
 
+    /**
+     * 全局的方法表和事件表缓存，避免重复查找
+     */
     static class Cache {
 
         // key=注册类的完整类名 target.getClass().getName()
@@ -45,6 +57,11 @@ public class Bus {
         static final Bus INSTANCE = new Bus();
     }
 
+    /**
+     * 获取 默认的Bus实例
+     *
+     * @return Bus
+     */
     public static Bus getDefault() {
         return SingletonHolder.INSTANCE;
     }
@@ -59,9 +76,11 @@ public class Bus {
     // value=事件参数所属的Subscriber对象集合
     // eventType->subscriber set
     private final Map<Class<?>, Set<Subscriber>> mSubscriberMap;
+    // sticky event map, one event per type
     private final Map<Class<?>, Object> mStickyEventMap;
-
+    // method finder
     private MethodFinder mMethodFinder;
+    // strict mode
     private boolean mStrictMode;
 
     private Scheduler mMainScheduler;
@@ -69,6 +88,7 @@ public class Bus {
     private Scheduler mThreadScheduler;
 
     private StopWatch mStopWatch;
+
     private volatile boolean mDebug;
 
     private Bus() {
@@ -169,6 +189,12 @@ public class Bus {
         }
     }
 
+    /**
+     * 注册事件接收对象
+     *
+     * @param target Event Target
+     * @param <T>    target type
+     */
     public <T> void register(final T target) {
         if (mDebug) {
             Log.v(TAG, "register() target:[" + target + "]");
@@ -180,6 +206,12 @@ public class Bus {
         }
     }
 
+    /**
+     * 取消注册事件对象
+     *
+     * @param target Target
+     * @param <T>    target type
+     */
     public <T> void unregister(final T target) {
         if (mDebug) {
             Log.v(TAG, "unregister() target:" + target);
@@ -209,6 +241,12 @@ public class Bus {
         }
     }
 
+    /**
+     * 发送持久事件
+     *
+     * @param event 事件对象
+     * @param <E>   事件类型
+     */
     public <E> void postSticky(E event) {
         post(event);
         synchronized (mStickyEventMap) {
@@ -216,6 +254,12 @@ public class Bus {
         }
     }
 
+    /**
+     * 发送事件
+     *
+     * @param event 事件对象
+     * @param <E>   事件类型
+     */
     public <E> void post(E event) {
         final Class<?> theEventType = event.getClass();
         if (mDebug) {
@@ -267,6 +311,13 @@ public class Bus {
         }
     }
 
+    /**
+     * 发送某个事件给某个特定类型的订阅者
+     *
+     * @param event     事件对象
+     * @param eventType 匹配的事件类型
+     * @param <E>       事件类型
+     */
     private <E> void postEventByType(final E event, final Class<?> eventType) {
         final Set<Subscriber> subscribers = mSubscriberMap.get(eventType);
         if (subscribers == null || subscribers.isEmpty()) {
@@ -277,6 +328,11 @@ public class Bus {
         }
     }
 
+    /**
+     * 发送某个事件给某个订阅者
+     *
+     * @param emitter EventEmitter
+     */
     public void sendEvent(EventEmitter emitter) {
         if (mDebug) {
             Log.v(TAG, "send event:" + emitter);
