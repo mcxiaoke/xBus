@@ -3,6 +3,7 @@ package com.mcxiaoke.bus;
 import android.util.Log;
 import com.mcxiaoke.bus.method.AnnotationMethodFinder;
 import com.mcxiaoke.bus.method.MethodFinder;
+import com.mcxiaoke.bus.method.NamedMethodFinder;
 import com.mcxiaoke.bus.scheduler.Scheduler;
 import com.mcxiaoke.bus.scheduler.Schedulers;
 
@@ -99,6 +100,19 @@ public class Bus {
 
     public boolean isStrictMode() {
         return mStrictMode;
+    }
+
+    Bus setPerformanceMode(final boolean enable) {
+        if (enable) {
+            // performance mode: name finder+strict match
+            setMethodFinder(new NamedMethodFinder());
+            setStrictMode(true);
+        } else {
+            // default mode: annotation finder+ non-strict match
+            setMethodFinder(new AnnotationMethodFinder());
+            setStrictMode(false);
+        }
+        return this;
     }
 
     private Set<MethodInfo> getMethods(Class<?> targetClass) {
