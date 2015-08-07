@@ -19,9 +19,11 @@ public class MethodHelper {
 
 
     public static boolean shouldSkipClass(final Class<?> clazz) {
+        if (clazz == null || Object.class.equals(clazz)) {
+            return true;
+        }
         final String clsName = clazz.getName();
-        return Object.class.equals(clazz)
-                || clsName.startsWith("java.")
+        return clsName.startsWith("java.")
                 || clsName.startsWith("javax.")
                 || clsName.startsWith("android.")
                 || clsName.startsWith("com.android.");
@@ -56,8 +58,8 @@ public class MethodHelper {
         final Set<MethodInfo> methods = new HashSet<MethodInfo>();
         while (!shouldSkipClass(clazz)) {
             final Method[] clsMethods = clazz.getDeclaredMethods();
-            System.out.println("findSubscriberMethods() " + clazz.getSimpleName()
-                    + " has " + clsMethods.length + " methods");
+//            System.out.println("findSubscriberMethods() " + clazz.getSimpleName()
+//                    + " has " + clsMethods.length + " methods");
             for (final Method method : clsMethods) {
                 final MethodInfo methodInfo = converter.convert(method);
                 if (methodInfo != null) {
