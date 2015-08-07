@@ -92,8 +92,9 @@ public class Bus {
         return this;
     }
 
-    public void setStrictMode(final boolean strictMode) {
+    public Bus setStrictMode(final boolean strictMode) {
         mStrictMode = strictMode;
+        return this;
     }
 
     public boolean isStrictMode() {

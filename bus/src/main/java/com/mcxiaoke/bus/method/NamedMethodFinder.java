@@ -11,17 +11,17 @@ import java.util.Set;
  * Time: 18:17
  */
 public class NamedMethodFinder implements MethodFinder {
-    private static final String NAME_DEFAULT = "onEvent";
+    public static final String DEFAULT_NAME = "onEvent";
 
     private final String name;
 
     public NamedMethodFinder() {
-        this(NAME_DEFAULT);
+        this(DEFAULT_NAME);
     }
 
     public NamedMethodFinder(final String name) {
         if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException("invalid name");
+            throw new IllegalArgumentException("invalid method name");
         }
         this.name = name;
     }

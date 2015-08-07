@@ -78,13 +78,13 @@ public class MethodHelper {
             @Override
             public MethodInfo convert(final Method method) {
                 // check annotation
-                if (!method.isAnnotationPresent(BusReceiver.class)) {
+                final BusReceiver annotation = method.getAnnotation(BusReceiver.class);
+                if (annotation == null) {
                     return null;
                 }
                 if (!isValidMethod(method)) {
                     return null;
                 }
-                BusReceiver annotation = method.getAnnotation(BusReceiver.class);
                 return new MethodInfo(method, targetClass, annotation.mode());
             }
         };
@@ -97,7 +97,7 @@ public class MethodHelper {
             @Override
             public MethodInfo convert(final Method method) {
                 // check name
-                if (!name.equals(method.getName())) {
+                if (!method.getName().equals(name)) {
                     return null;
                 }
                 if (!isValidMethod(method)) {
