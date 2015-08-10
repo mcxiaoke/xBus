@@ -13,6 +13,7 @@
 * [跟我一起写EventBus（一）](docs/how-to-write-an-eventbus-part1.md)
 * [跟我一起写EventBus（二）](docs/how-to-write-an-eventbus-part2.md)
 * [跟我一起写EventBus（三）](docs/how-to-write-an-eventbus-part3.md)
+* [跟我一起写EventBus（四）](docs/how-to-write-an-eventbus-part4.md)
 
 ### Gradle集成
 
