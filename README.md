@@ -8,6 +8,11 @@
 
 [![Maven Central](http://img.shields.io/badge/2015.08.08-com.mcxiaoke.next:1.0.0-brightgreen.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.mcxiaoke.xbus%22)
 
+## 实现教程
+
+* [跟我一起写EventBus（一）](docs/how-to-write-an-eventbus-part1.md)
+* [跟我一起写EventBus（二）](docs/how-to-write-an-eventbus-part2.md)
+* [跟我一起写EventBus（三）](docs/how-to-write-an-eventbus-part3.md)
 
 ### Gradle集成
 
@@ -216,10 +221,6 @@ public <E> void postSticky(E event)
 
 还有一个注解 `@BusEvent` 可用于标注某个类是事件类，这个像 `@Override` 注解一样，纯标注用，没有其它用途，没有运行时消耗。
   
-## 实现教程
-
-* [跟我一起写EventBus（一）](docs/how-to-write-an-eventbus-part1.md)
-* [跟我一起写EventBus（二）](docs/how-to-write-an-eventbus-part2.md)
 
 ## 项目状态
 
