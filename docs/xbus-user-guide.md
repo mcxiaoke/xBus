@@ -1,10 +1,13 @@
-# xBus - 简洁的EventBus实现
+# xBus使用指南
 
-基于发布订阅(Pub/Sub)模式的一个事件消息库，使用通用的 `register(target)`, `unregister(target)`, `post(event)` 消息通信接口，能有效的减少甚至消除Android应用中异步任务逻辑和界面更新之间的耦合，实现模块化，提高开发效率。
+## 实现教程
 
-[![Maven Central](http://img.shields.io/badge/2015.08.08-com.mcxiaoke.next:1.0.0-brightgreen.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.mcxiaoke.xbus%22)
+* [跟我一起写EventBus（一）](docs/how-to-write-an-eventbus-part1.md)
+* [跟我一起写EventBus（二）](docs/how-to-write-an-eventbus-part2.md)
+* [跟我一起写EventBus（三）](docs/how-to-write-an-eventbus-part3.md)
+* [跟我一起写EventBus（四）](docs/how-to-write-an-eventbus-part4.md)
 
-## 使用指南
+## 基本用法
 
 ### Gradle集成
 
@@ -212,14 +215,7 @@ public <E> void postSticky(E event)
 ### @BusEvent
 
 还有一个注解 `@BusEvent` 可用于标注某个类是事件类，这个像 `@Override` 注解一样，纯标注用，没有其它用途，没有运行时消耗。
-
-## 实现教程
-
-* [`跟我一起写EventBus（一）`](docs/how-to-write-an-eventbus-part1.md)
-* [`跟我一起写EventBus（二）`](docs/how-to-write-an-eventbus-part2.md)
-* [`跟我一起写EventBus（三）`](docs/how-to-write-an-eventbus-part3.md)
-* [`跟我一起写EventBus（四）`](docs/how-to-write-an-eventbus-part4.md)
-* [`xBus使用教程`](docs/xbus-user-guide.md)
+  
 
 ## 项目状态
 
@@ -229,42 +225,4 @@ public <E> void postSticky(E event)
 * 2015.08.05 **0.7.0** 改进架构，增加扩展支持和错误处理
 * 2015.08.06 **0.8.0** 完善了异常处理和简单的测试示例
 * 2015.08.08 **1.0.0** 基本功能全部完成，发布1.0.0正式版
-
-------
-
-## 关于作者
-
-#### 联系方式
-* Blog: <http://blog.mcxiaoke.com>
-* Github: <https://github.com/mcxiaoke>
-* Email: [mail@mcxiaoke.com](mailto:mail@mcxiaoke.com)
-
-#### 开源项目
-
-* Next公共组件库: <https://github.com/mcxiaoke/Android-Next>
-* Gradle渠道打包: <https://github.com/mcxiaoke/gradle-packer-plugin>
-* EventBus实现xBus: <https://github.com/mcxiaoke/xBus>
-* Rx文档中文翻译: <https://github.com/mcxiaoke/RxDocs>
-* MQTT协议中文版: <https://github.com/mcxiaoke/mqtt>
-* 蘑菇饭App: <https://github.com/mcxiaoke/minicat>
-* 饭否客户端: <https://github.com/mcxiaoke/fanfouapp-opensource>
-* Volley镜像: <https://github.com/mcxiaoke/android-volley>
-
-------
-
-## License
-
-    Copyright 2015 Xiaoke Zhang
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
+* 2015.08.10 **1.0.0** 完成四篇实现教程和一篇使用指南文档
