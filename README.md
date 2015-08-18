@@ -2,7 +2,7 @@
 
 基于发布订阅(Pub/Sub)模式的一个事件消息库，使用通用的 `register(target)`, `unregister(target)`, `post(event)` 消息通信接口，能有效的减少甚至消除Android应用中异步任务逻辑和界面更新之间的耦合，实现模块化，提高开发效率。
 
-[![Maven Central](http://img.shields.io/badge/2015.08.08-com.mcxiaoke.next:1.0.0-brightgreen.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.mcxiaoke.xbus%22)
+[![Maven Central](http://img.shields.io/badge/2015.08.18-com.mcxiaoke.next:1.0.1-brightgreen.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.mcxiaoke.xbus%22)
 
 ## 使用指南
 
@@ -229,6 +229,7 @@ public <E> void postSticky(E event)
 * 2015.08.05 **0.7.0** 改进架构，增加扩展支持和错误处理
 * 2015.08.06 **0.8.0** 完善了异常处理和简单的测试示例
 * 2015.08.08 **1.0.0** 基本功能全部完成，发布1.0.0正式版
+* 2015.08.18 **1.0.1** 修复 `unresiger` 时空指针的问题
 
 ------
 
