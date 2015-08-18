@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Xbus : Simple EventBus Implementation for Android">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Xbus</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/mcxiaoke/xBus">View on GitHub</a>
+
+          <h1 id="project_title">Xbus</h1>
+          <h2 id="project_tagline">Simple EventBus Implementation for Android</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/mcxiaoke/xBus/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/mcxiaoke/xBus/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="xbus---简洁的eventbus实现" class="anchor" href="#xbus---%E7%AE%80%E6%B4%81%E7%9A%84eventbus%E5%AE%9E%E7%8E%B0" aria-hidden="true"><span class="octicon octicon-link"></span></a>xBus - 简洁的EventBus实现</h1>
+
+<p>基于发布订阅(Pub/Sub)模式的一个事件消息库，使用通用的 <code>register(target)</code>, <code>unregister(target)</code>, <code>post(event)</code> 消息通信接口，能有效的减少甚至消除Android应用中异步任务逻辑和界面更新之间的耦合，实现模块化，提高开发效率。</p>
+
+<p><a href="http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.mcxiaoke.xbus%22"><img src="http://img.shields.io/badge/2015.08.18-com.mcxiaoke.next:1.0.1-brightgreen.svg" alt="Maven Central"></a></p>
+
+<ul>
+<li>2015.08.18 <strong>1.0.1</strong> - 修复 <code>unresiger()</code> 的空指针问题</li>
+<li>2015.08.08 <strong>1.0.0</strong> - 基本功能全部完成，发布1.0.0正式版</li>
+</ul>
+
+<h2>
+<a id="使用指南" class="anchor" href="#%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97" aria-hidden="true"><span class="octicon octicon-link"></span></a>使用指南</h2>
+
+<h3>
+<a id="gradle集成" class="anchor" href="#gradle%E9%9B%86%E6%88%90" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gradle集成</h3>
+
+<div class="highlight highlight-groovy"><pre>    compile <span class="pl-s"><span class="pl-pds">'</span>com.mcxiaoke.xbus:bus:1.0.+<span class="pl-pds">'</span></span></pre></div>
+
+<h3>
+<a id="接收事件" class="anchor" href="#%E6%8E%A5%E6%94%B6%E4%BA%8B%E4%BB%B6" aria-hidden="true"><span class="octicon octicon-link"></span></a>接收事件</h3>
+
+<div class="highlight highlight-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">SimpleActivity</span> <span class="pl-k">extends</span> <span class="pl-e">Activity</span> {
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">protected</span> <span class="pl-k">void</span> <span class="pl-en">onCreate</span>(<span class="pl-k">final</span> <span class="pl-smi">Bundle</span> <span class="pl-v">savedInstanceState</span>) {
+        <span class="pl-v">super</span><span class="pl-k">.</span>onCreate(savedInstanceState);
+        <span class="pl-c">// 注册</span>
+        <span class="pl-smi">Bus</span><span class="pl-k">.</span>getDefault()<span class="pl-k">.</span>register(<span class="pl-v">this</span>);
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">protected</span> <span class="pl-k">void</span> <span class="pl-en">onDestroy</span>() {
+        <span class="pl-v">super</span><span class="pl-k">.</span>onDestroy();
+        <span class="pl-c">// 取消注册</span>
+        <span class="pl-smi">Bus</span><span class="pl-k">.</span>getDefault()<span class="pl-k">.</span>unregister(<span class="pl-v">this</span>);
+    }
+
+    <span class="pl-k">@BusReceiver</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onStringEvent</span>(<span class="pl-smi">String</span> <span class="pl-v">event</span>) {
+        <span class="pl-c">// handle your event</span>
+        <span class="pl-c">// 这里处理事件</span>
+    }
+
+    <span class="pl-k">@BusReceiver</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onSomeEvent</span>(<span class="pl-smi">SomeEventClass</span> <span class="pl-v">event</span>) {
+        <span class="pl-c">// SomeEventClass表示任意的自定义类</span>
+        <span class="pl-c">// handle your event</span>
+        <span class="pl-c">// 这里处理事件</span>
+    }
+
+    <span class="pl-k">@BusReceiver</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onObjectEvent</span>(<span class="pl-smi">Object</span> <span class="pl-v">event</span>) {
+        <span class="pl-c">// 不建议使用Object，会收到所有类型的事件</span>
+        <span class="pl-c">// handle your event</span>
+        <span class="pl-c">// 这里处理事件</span>
+    }
+}</pre></div>
+
+<h3>
+<a id="发送事件" class="anchor" href="#%E5%8F%91%E9%80%81%E4%BA%8B%E4%BB%B6" aria-hidden="true"><span class="octicon octicon-link"></span></a>发送事件</h3>
+
+<p>然后在需要的地方调用 <code>post(event)</code> 发送事件通知，如 <code>Service</code> 或某个线程里，可以在任何地方发送事件：</p>
+
+<div class="highlight highlight-java"><pre><span class="pl-c">// 比如在IntentService里</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">SimpleService</span> <span class="pl-k">extends</span> <span class="pl-e">IntentService</span> {
+
+    <span class="pl-k">public</span> <span class="pl-en">SimpleService</span>() {
+        <span class="pl-v">super</span>(<span class="pl-s"><span class="pl-pds">"</span>SimpleService<span class="pl-pds">"</span></span>);
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">protected</span> <span class="pl-k">void</span> <span class="pl-en">onHandleIntent</span>(<span class="pl-k">final</span> <span class="pl-smi">Intent</span> <span class="pl-v">intent</span>) {
+       <span class="pl-c">// 这里是举例，可以在任何地方发送事件</span>
+        <span class="pl-smi">Bus</span><span class="pl-k">.</span>getDefault()<span class="pl-k">.</span>post(<span class="pl-s"><span class="pl-pds">"</span>String Event<span class="pl-pds">"</span></span>);
+        <span class="pl-smi">Bus</span><span class="pl-k">.</span>getDefault()<span class="pl-k">.</span>post(<span class="pl-k">new</span> <span class="pl-smi">SomeEventClass</span>());
+        <span class="pl-smi">Bus</span><span class="pl-k">.</span>getDefault()<span class="pl-k">.</span>post(<span class="pl-k">new</span> <span class="pl-smi">Object</span>());
+    }
+}</pre></div>
+
+<h2>
+<a id="高级用法" class="anchor" href="#%E9%AB%98%E7%BA%A7%E7%94%A8%E6%B3%95" aria-hidden="true"><span class="octicon octicon-link"></span></a>高级用法</h2>
+
+<h3>
+<a id="任何地方注册" class="anchor" href="#%E4%BB%BB%E4%BD%95%E5%9C%B0%E6%96%B9%E6%B3%A8%E5%86%8C" aria-hidden="true"><span class="octicon octicon-link"></span></a>任何地方注册</h3>
+
+<p>你还可以选择在 <code>onStart()</code> 里注册，在 <code>onStop()</code> 里取消注册。你完全可以在任何地方注册和取消注册，没有任何限制。但是建议你在生命周期事件方法里注册和取消注册，如 <code>Activity/Fragment/Service</code> 的 <code>onCreate/onDestroy</code> 方法里， <code>register()</code> 和 <code>unregister()</code> 建议配对使用，避免内存泄露。</p>
+
+<div class="highlight highlight-java"><pre>    @<span class="pl-smi">Override</span>
+    <span class="pl-k">protected</span> <span class="pl-k">void</span> onStart() {
+        <span class="pl-v">super</span><span class="pl-k">.</span>onStart();
+        <span class="pl-c">// you can also register here</span>
+        <span class="pl-smi">Bus</span><span class="pl-k">.</span>getDefault()<span class="pl-k">.</span>register(<span class="pl-v">this</span>);
+    }
+
+    @<span class="pl-smi">Override</span>
+    <span class="pl-k">protected</span> <span class="pl-k">void</span> onStop() {
+        <span class="pl-v">super</span><span class="pl-k">.</span>onStop();
+        <span class="pl-c">// you can also unregister here</span>
+        <span class="pl-smi">Bus</span><span class="pl-k">.</span>getDefault()<span class="pl-k">.</span>unregister(<span class="pl-v">this</span>);
+    }</pre></div>
+
+<h3>
+<a id="自定义-bus" class="anchor" href="#%E8%87%AA%E5%AE%9A%E4%B9%89-bus" aria-hidden="true"><span class="octicon octicon-link"></span></a>自定义 <code>Bus</code>
+</h3>
+
+<p>你也可以不使用默认的 <code>Bus.getDefault()</code>，改用自己创建的 <code>Bus</code> 对象：</p>
+
+<div class="highlight highlight-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">MainApp</span> <span class="pl-k">extends</span> <span class="pl-e">Application</span> {
+
+    <span class="pl-k">private</span> <span class="pl-smi">Bus</span> mBus <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">Bus</span>();
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onCreate</span>() {
+        <span class="pl-v">super</span><span class="pl-k">.</span>onCreate();
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">Bus</span> <span class="pl-en">getBus</span>() {
+        <span class="pl-k">return</span> mBus;
+    }
+}</pre></div>
+
+<h3>
+<a id="debug" class="anchor" href="#debug" aria-hidden="true"><span class="octicon octicon-link"></span></a>Debug</h3>
+
+<p>默认不输出任何LOG信息，可以这样启用调试模式：</p>
+
+<div class="highlight highlight-java"><pre><span class="pl-k">public</span> <span class="pl-smi">Bus</span> setDebug(<span class="pl-k">final</span> <span class="pl-k">boolean</span> debug)</pre></div>
+
+<h3>
+<a id="methodfinder" class="anchor" href="#methodfinder" aria-hidden="true"><span class="octicon octicon-link"></span></a>MethodFinder</h3>
+
+<p>默认使用注解(<code>@BusReceiver</code>)识别事件接收器方法，可以这样修改 ：</p>
+
+<div class="highlight highlight-java"><pre><span class="pl-k">public</span> <span class="pl-smi">Bus</span> setMethodFinder(<span class="pl-k">final</span> <span class="pl-smi">MethodFinder</span> finder)</pre></div>
+
+<p>默认使用的是 AnnotationMethodFinder，只有使用了 @BusReceiver 的方法才可以接受事件。</p>
+
+<p>可选使用 <code>NamedMethodFinder</code> ，<code>NamedMethodFinder</code> 使用方法名识别，默认方法名是 <code>onEvent</code> ，你可以指定其它的方法名。</p>
+
+<p>使用 <code>NamedMethodFinder</code> 会比使用 <code>AnnotationMethodFinder</code> 效率高一点，因为它忽略注解，直接使用方法名字符串匹配。一般使用，两者差别不大。</p>
+
+<p>你还可以实现 <code>MethodFinder</code> 接口，自定义其它的事件接收器方法匹配模式：</p>
+
+<pre><code>interface MethodFinder {
+
+    Set&lt;MethodInfo&gt; find(final Bus bus, final Class&lt;?&gt; targetClass);
+}
+</code></pre>
+
+<h3>
+<a id="strictmode" class="anchor" href="#strictmode" aria-hidden="true"><span class="octicon octicon-link"></span></a>StrictMode</h3>
+
+<h4>
+<a id="宽泛匹配模式" class="anchor" href="#%E5%AE%BD%E6%B3%9B%E5%8C%B9%E9%85%8D%E6%A8%A1%E5%BC%8F" aria-hidden="true"><span class="octicon octicon-link"></span></a>宽泛匹配模式</h4>
+
+<p>默认情况下， <code>Bus</code> 使用宽泛的事件类型匹配模式，事件参数会匹配它的父类和接口，如果你调用 <code>post(String)</code>，那么这几个方法都会收到举例：</p>
+
+<div class="highlight highlight-java"><pre><span class="pl-c">// 如果你调用这个方法，发送一个StringBuilder类型的事件</span>
+<span class="pl-smi">Bus</span><span class="pl-k">.</span>getDefault()<span class="pl-k">.</span>post(<span class="pl-k">new</span> <span class="pl-smi">StringBuilder</span>(<span class="pl-s"><span class="pl-pds">"</span>Event<span class="pl-pds">"</span></span>));
+
+<span class="pl-c">// 这几个方法会收到事件</span>
+<span class="pl-k">public</span> <span class="pl-k">void</span> onEvent1(<span class="pl-smi">StringBuilder</span> event) <span class="pl-c">// 匹配，类型相符</span>
+<span class="pl-k">public</span> <span class="pl-k">void</span> onEvent2(<span class="pl-smi">Object</span> event) <span class="pl-c">// 匹配，StringBuilder是Object的子类</span>
+<span class="pl-k">public</span> <span class="pl-k">void</span> onEvent3(<span class="pl-smi">CharSequence</span> event) <span class="pl-c">// 匹配，StringBuilder是CharSequence的实现类</span>
+<span class="pl-k">public</span> <span class="pl-k">void</span> onEvent4(<span class="pl-smi">Serializable</span> event) <span class="pl-c">// 匹配，StringBuilder实现了Serializable接口</span>
+
+<span class="pl-c">// 这几个方法不会收到事件</span>
+<span class="pl-k">public</span> <span class="pl-k">void</span> onEvent5(<span class="pl-smi">Exception</span> event) 不匹配，<span class="pl-smi">Exception</span>与<span class="pl-smi">String</span>完全无关
+<span class="pl-k">public</span> <span class="pl-k">void</span> onEvent6(<span class="pl-smi">String</span> event) <span class="pl-c">// 不匹配，StringBuilder不能转换成String类型</span>
+</pre></div>
+
+<p>对于 <code>post(event)</code> 和 <code>onEvent(EventType)</code> ，匹配规则是：如果  <code>event.getClass()</code>  可以强制转换成 <code>EventType</code>，那么匹配成功，能收到事件。</p>
+
+<h4>
+<a id="严格匹配模式" class="anchor" href="#%E4%B8%A5%E6%A0%BC%E5%8C%B9%E9%85%8D%E6%A8%A1%E5%BC%8F" aria-hidden="true"><span class="octicon octicon-link"></span></a>严格匹配模式</h4>
+
+<p>可以使用下面的方法更改默认行为，使用严格的事件类型匹配模式：</p>
+
+<div class="highlight highlight-java"><pre><span class="pl-k">public</span> <span class="pl-smi">Bus</span> setStrictMode(<span class="pl-k">final</span> <span class="pl-k">boolean</span> strictMode)</pre></div>
+
+<p>启用严格匹配模式后，发送和接受方法的参数类型必须严格匹配才能收到事件，举例：</p>
+
+<div class="highlight highlight-java"><pre><span class="pl-c">// setStrictMode(true) 启用严格模式后：</span>
+<span class="pl-smi">Bus</span><span class="pl-k">.</span>getDefault()<span class="pl-k">.</span>post(<span class="pl-k">new</span> <span class="pl-smi">StringBuilder</span>(<span class="pl-s"><span class="pl-pds">"</span>Event<span class="pl-pds">"</span></span>));
+
+<span class="pl-c">// 只有 onEvent1 能收到事件</span>
+<span class="pl-k">public</span> <span class="pl-k">void</span> onEvent1(<span class="pl-smi">StringBuilder</span> event)
+<span class="pl-k">public</span> <span class="pl-k">void</span> onEvent2(<span class="pl-smi">Object</span> event)<span class="pl-k">public</span> <span class="pl-k">void</span> onEvent3(<span class="pl-smi">CharSequence</span> event) 
+<span class="pl-k">public</span> <span class="pl-k">void</span> onEvent4(<span class="pl-smi">Serializable</span> event)
+<span class="pl-k">public</span> <span class="pl-k">void</span> onEvent5(<span class="pl-smi">Exception</span> event)
+<span class="pl-k">public</span> <span class="pl-k">void</span> onEvent6(<span class="pl-smi">String</span> event) </pre></div>
+
+<p>对于 <code>post(event)</code> 和 <code>onEvent(EventType)</code> ，严格模式的匹配规则是当且仅当 <code>event.getClass().equals(EventType)</code> 时才能收到事件。</p>
+
+<p>说明：启用严格模式效率会稍微高一点，因为不会递归查找 <code>event</code> 的父类和实现的接口，但是由于 <code>Bus</code> 内部使用了缓存，对于同一个事件类型，并不会重复查找，所以实际使用几乎没有差别。</p>
+
+<h3>
+<a id="stickyevent" class="anchor" href="#stickyevent" aria-hidden="true"><span class="octicon octicon-link"></span></a>StickyEvent</h3>
+
+<p>可以使用下面的方法发送 <code>Sticky</code> 事件，这种事件会保留在内存中，当下一个注册者注册时，会立即收到上一次发送的该类型事件，每种类型的事件只会保留一个， <code>Sticky</code> 事件使用严格匹配模式。</p>
+
+<div class="highlight highlight-java"><pre><span class="pl-k">public</span> <span class="pl-k">&lt;</span><span class="pl-smi">E</span><span class="pl-k">&gt;</span> <span class="pl-k">void</span> postSticky(<span class="pl-smi">E</span> event) </pre></div>
+
+<p>一般不需要使用 <code>Sticky</code> 事件，但在某些场景下可以用到，比如一个网络状态监听服务，会不断的发送网络状态信息，接受者一旦注册就可以立即收到一个事件，可以知道当前的网络状态。</p>
+
+<h3>
+<a id="busevent" class="anchor" href="#busevent" aria-hidden="true"><span class="octicon octicon-link"></span></a>@BusEvent</h3>
+
+<p>还有一个注解 <code>@BusEvent</code> 可用于标注某个类是事件类，这个像 <code>@Override</code> 注解一样，纯标注用，没有其它用途，没有运行时消耗。</p>
+
+<h2>
+<a id="实现教程" class="anchor" href="#%E5%AE%9E%E7%8E%B0%E6%95%99%E7%A8%8B" aria-hidden="true"><span class="octicon octicon-link"></span></a>实现教程</h2>
+
+<ul>
+<li><a href="docs/how-to-write-an-eventbus-part1.md"><code>跟我一起写EventBus（一）</code></a></li>
+<li><a href="docs/how-to-write-an-eventbus-part2.md"><code>跟我一起写EventBus（二）</code></a></li>
+<li><a href="docs/how-to-write-an-eventbus-part3.md"><code>跟我一起写EventBus（三）</code></a></li>
+<li><a href="docs/how-to-write-an-eventbus-part4.md"><code>跟我一起写EventBus（四）</code></a></li>
+<li><a href="docs/xbus-user-guide.md"><code>xBus使用教程</code></a></li>
+</ul>
+
+<h2>
+<a id="项目状态" class="anchor" href="#%E9%A1%B9%E7%9B%AE%E7%8A%B6%E6%80%81" aria-hidden="true"><span class="octicon octicon-link"></span></a>项目状态</h2>
+
+<ul>
+<li>2015.08.03 <strong>0.1.0</strong> 草稿版，实现了一个最简单的可用的原型</li>
+<li>2015.08.03 <strong>0.2.0</strong> 支持在基类中注册和添加事件接收器方法</li>
+<li>2015.08.04 <strong>0.6.0</strong> 半成品，支持注册对象和事件类型的继承</li>
+<li>2015.08.05 <strong>0.7.0</strong> 改进架构，增加扩展支持和错误处理</li>
+<li>2015.08.06 <strong>0.8.0</strong> 完善了异常处理和简单的测试示例</li>
+</ul>
+
+<hr>
+
+<h2>
+<a id="关于作者" class="anchor" href="#%E5%85%B3%E4%BA%8E%E4%BD%9C%E8%80%85" aria-hidden="true"><span class="octicon octicon-link"></span></a>关于作者</h2>
+
+<h4>
+<a id="联系方式" class="anchor" href="#%E8%81%94%E7%B3%BB%E6%96%B9%E5%BC%8F" aria-hidden="true"><span class="octicon octicon-link"></span></a>联系方式</h4>
+
+<ul>
+<li>Blog: <a href="http://blog.mcxiaoke.com">http://blog.mcxiaoke.com</a>
+</li>
+<li>Github: <a href="https://github.com/mcxiaoke">https://github.com/mcxiaoke</a>
+</li>
+<li>Email: <a href="mailto:mail@mcxiaoke.com">mail@mcxiaoke.com</a>
+</li>
+</ul>
+
+<h4>
+<a id="开源项目" class="anchor" href="#%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE" aria-hidden="true"><span class="octicon octicon-link"></span></a>开源项目</h4>
+
+<ul>
+<li>Next公共组件库: <a href="https://github.com/mcxiaoke/Android-Next">https://github.com/mcxiaoke/Android-Next</a>
+</li>
+<li>Gradle渠道打包: <a href="https://github.com/mcxiaoke/gradle-packer-plugin">https://github.com/mcxiaoke/gradle-packer-plugin</a>
+</li>
+<li>EventBus实现xBus: <a href="https://github.com/mcxiaoke/xBus">https://github.com/mcxiaoke/xBus</a>
+</li>
+<li>Rx文档中文翻译: <a href="https://github.com/mcxiaoke/RxDocs">https://github.com/mcxiaoke/RxDocs</a>
+</li>
+<li>MQTT协议中文版: <a href="https://github.com/mcxiaoke/mqtt">https://github.com/mcxiaoke/mqtt</a>
+</li>
+<li>蘑菇饭App: <a href="https://github.com/mcxiaoke/minicat">https://github.com/mcxiaoke/minicat</a>
+</li>
+<li>饭否客户端: <a href="https://github.com/mcxiaoke/fanfouapp-opensource">https://github.com/mcxiaoke/fanfouapp-opensource</a>
+</li>
+<li>Volley镜像: <a href="https://github.com/mcxiaoke/android-volley">https://github.com/mcxiaoke/android-volley</a>
+</li>
+</ul>
+
+<hr>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<pre><code>Copyright 2015 Xiaoke Zhang
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+</code></pre>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Xbus maintained by <a href="https://github.com/mcxiaoke">mcxiaoke</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
