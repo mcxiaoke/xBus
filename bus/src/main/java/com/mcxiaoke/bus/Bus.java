@@ -122,7 +122,7 @@ public class Bus {
         return mStrictMode;
     }
 
-    Bus setPerformanceMode(final boolean enable) {
+    public Bus setPerformanceMode(final boolean enable) {
         if (enable) {
             // performance mode: name finder+strict match
             setMethodFinder(new NamedMethodFinder());
@@ -218,6 +218,10 @@ public class Bus {
             mStopWatch.start("unregister()");
         }
         final Set<Class<?>> eventTypes = mEventMap.remove(target);
+        if(eventTypes==null || eventTypes.isEmpty()){
+            Log.v(TAG, "unregister() no subscriber for target:" + target);
+            return;
+        }
         for (Class<?> eventType : eventTypes) {
             Set<Subscriber> subscribers = mSubscriberMap.get(eventType);
             if (subscribers == null || subscribers.isEmpty()) {
