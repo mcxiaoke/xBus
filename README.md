@@ -4,6 +4,9 @@
 
 [![Maven Central](http://img.shields.io/badge/2015.08.18-com.mcxiaoke.next:1.0.1-brightgreen.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.mcxiaoke.xbus%22)
 
+* 2015.08.18 **1.0.1** - 修复 `unresiger()` 的空指针问题
+* 2015.08.08 **1.0.0** - 基本功能全部完成，发布1.0.0正式版
+
 ## 使用指南
 
 ### Gradle集成
@@ -228,8 +231,6 @@ public <E> void postSticky(E event)
 * 2015.08.04 **0.6.0** 半成品，支持注册对象和事件类型的继承
 * 2015.08.05 **0.7.0** 改进架构，增加扩展支持和错误处理
 * 2015.08.06 **0.8.0** 完善了异常处理和简单的测试示例
-* 2015.08.08 **1.0.0** 基本功能全部完成，发布1.0.0正式版
-* 2015.08.18 **1.0.1** 修复 `unresiger` 时空指针的问题
 
 ------
 
