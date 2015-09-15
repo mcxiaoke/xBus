@@ -154,10 +154,13 @@ public class Bus {
         // 建立target-->eventType的对应关系
         // 每个target对象里可能有多个事件接收器方法，会订阅多个类型的event
         Class<?> targetType = target.getClass();
-        Set<Class<?>> eventTypes = mEventMap.get(target);
-        if (eventTypes == null) {
-            eventTypes = new HashSet<Class<?>>();
-            mEventMap.put(target, eventTypes);
+        Set<Class<?>> eventTypes;
+        synchronized (mEventMap) {
+            eventTypes = mEventMap.get(target);
+            if (eventTypes == null) {
+                eventTypes = new HashSet<Class<?>>();
+                mEventMap.put(target, eventTypes);
+            }
         }
         // 这里找出target里包含的所有事件接收器方法
         Set<MethodInfo> methods = getMethods(targetType);
@@ -189,6 +192,10 @@ public class Bus {
         }
     }
 
+    public <T> void subscribe(final T target, final String methodName) {
+
+    }
+
     /**
      * 注册事件接收对象
      *
@@ -218,7 +225,7 @@ public class Bus {
             mStopWatch.start("unregister()");
         }
         final Set<Class<?>> eventTypes = mEventMap.remove(target);
-        if(eventTypes==null || eventTypes.isEmpty()){
+        if (eventTypes == null || eventTypes.isEmpty()) {
             Log.v(TAG, "unregister() no subscriber for target:" + target);
             return;
         }
@@ -322,7 +329,7 @@ public class Bus {
      * @param eventType 匹配的事件类型
      * @param <E>       事件类型
      */
-    private <E> void postEventByType(final E event, final Class<?> eventType) {
+    private synchronized <E> void postEventByType(final E event, final Class<?> eventType) {
         final Set<Subscriber> subscribers = mSubscriberMap.get(eventType);
         if (subscribers == null || subscribers.isEmpty()) {
             return;
