@@ -2,8 +2,9 @@
 
 基于发布订阅(Pub/Sub)模式的一个事件消息库，使用通用的 `register(target)`, `unregister(target)`, `post(event)` 消息通信接口，能有效的减少甚至消除Android应用中异步任务逻辑和界面更新之间的耦合，实现模块化，提高开发效率。
 
-[![Maven Central](http://img.shields.io/badge/2015.08.18-com.mcxiaoke.next:1.0.1-brightgreen.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.mcxiaoke.xbus%22)
+[![Maven Central](http://img.shields.io/badge/2015.08.18-com.mcxiaoke.next:1.0.2-brightgreen.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.mcxiaoke.xbus%22)
 
+* 2015.09.15 **1.0.2** - 修复多线程发送事件的同步问题
 * 2015.08.18 **1.0.1** - 修复 `unresiger()` 的空指针问题
 * 2015.08.08 **1.0.0** - 基本功能全部完成，发布1.0.0正式版
 
