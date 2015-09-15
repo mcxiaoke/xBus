@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new Throwable().printStackTrace();
         setContentView(R.layout.act_main);
         ButterKnife.bind(this);
         Bus.getDefault().setDebug(true);
