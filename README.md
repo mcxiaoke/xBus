@@ -19,8 +19,8 @@
 - [实现教程](#实现教程)
 - [项目状态](#项目状态)
 - [关于作者](#关于作者)
-        - [联系方式](#联系方式)
-        - [开源项目](#开源项目)
+    - [联系方式](#联系方式)
+    - [开源项目](#开源项目)
 - [License](#license)
 
 <!-- /TOC -->
@@ -262,12 +262,12 @@ public <E> void postSticky(E event)
 
 ## 关于作者
 
-#### 联系方式
+### 联系方式
 * Blog: <http://blog.mcxiaoke.com>
 * Github: <https://github.com/mcxiaoke>
 * Email: [mail@mcxiaoke.com](mailto:mail@mcxiaoke.com)
 
-#### 开源项目
+### 开源项目
 
 * Awesome-Kotlin: <https://github.com/mcxiaoke/awesome-kotlin>
 * Kotlin-Koi: <https://github.com/mcxiaoke/kotlin-koi>
