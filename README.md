@@ -17,7 +17,6 @@
     - [StickyEvent](#stickyevent)
     - [@BusEvent](#busevent)
 - [实现教程](#实现教程)
-- [项目状态](#项目状态)
 - [关于作者](#关于作者)
     - [联系方式](#联系方式)
     - [开源项目](#开源项目)
@@ -27,7 +26,7 @@
 
 基于发布订阅(Pub/Sub)模式的一个事件消息库，使用通用的 `register(target)`, `unregister(target)`, `post(event)` 消息通信接口，能有效的减少甚至消除Android应用中异步任务逻辑和界面更新之间的耦合，实现模块化，提高开发效率。
 
-[![Maven Central](http://img.shields.io/badge/2015.08.18-com.mcxiaoke.next:1.0.2-brightgreen.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.mcxiaoke.xbus%22)
+[![Maven Central](https://img.shields.io/badge/2015.08.18-com.mcxiaoke.xbus:bus:1.0.2-brightgreen.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.mcxiaoke.xbus%22)
 
 * 2015.09.15 **1.0.2** - 修复多线程发送事件的同步问题
 * 2015.08.18 **1.0.1** - 修复 `unresiger()` 的空指针问题
@@ -249,14 +248,6 @@ public <E> void postSticky(E event)
 * [`跟我一起写EventBus（三）`](docs/how-to-write-an-eventbus-part3.md)
 * [`跟我一起写EventBus（四）`](docs/how-to-write-an-eventbus-part4.md)
 * [`xBus使用教程`](docs/xbus-user-guide.md)
-
-## 项目状态
-
-* 2015.08.03 **0.1.0** 草稿版，实现了一个最简单的可用的原型
-* 2015.08.03 **0.2.0** 支持在基类中注册和添加事件接收器方法
-* 2015.08.04 **0.6.0** 半成品，支持注册对象和事件类型的继承
-* 2015.08.05 **0.7.0** 改进架构，增加扩展支持和错误处理
-* 2015.08.06 **0.8.0** 完善了异常处理和简单的测试示例
 
 ------
 
