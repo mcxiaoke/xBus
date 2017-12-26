@@ -1,5 +1,26 @@
 # xBus使用指南
 
+<!-- TOC -->
+
+- [xBus使用指南](#xbus使用指南)
+    - [实现教程](#实现教程)
+    - [基本用法](#基本用法)
+        - [Gradle集成](#gradle集成)
+        - [接收事件](#接收事件)
+        - [发送事件](#发送事件)
+    - [高级用法](#高级用法)
+        - [任何地方注册](#任何地方注册)
+        - [自定义 `Bus`](#自定义-bus)
+        - [Debug](#debug)
+        - [MethodFinder](#methodfinder)
+        - [StrictMode](#strictmode)
+            - [宽泛匹配模式](#宽泛匹配模式)
+            - [严格匹配模式](#严格匹配模式)
+        - [StickyEvent](#stickyevent)
+        - [@BusEvent](#busevent)
+
+<!-- /TOC -->
+
 ## 实现教程
 
 * [跟我一起写EventBus（一）](docs/how-to-write-an-eventbus-part1.md)
@@ -192,10 +213,10 @@ Bus.getDefault().post(new StringBuilder("Event"));
 
 // 只有 onEvent1 能收到事件
 public void onEvent1(StringBuilder event)
-public void onEvent2(Object event)public void onEvent3(CharSequence event) 
+public void onEvent2(Object event)public void onEvent3(CharSequence event)
 public void onEvent4(Serializable event)
 public void onEvent5(Exception event)
-public void onEvent6(String event) 
+public void onEvent6(String event)
 ```
 
 对于 `post(event)` 和 `onEvent(EventType)` ，严格模式的匹配规则是当且仅当 `event.getClass().equals(EventType)` 时才能收到事件。
@@ -207,7 +228,7 @@ public void onEvent6(String event)
 可以使用下面的方法发送 `Sticky` 事件，这种事件会保留在内存中，当下一个注册者注册时，会立即收到上一次发送的该类型事件，每种类型的事件只会保留一个， `Sticky` 事件使用严格匹配模式。
 
 ```java
-public <E> void postSticky(E event) 
+public <E> void postSticky(E event)
 ```
 
 一般不需要使用 `Sticky` 事件，但在某些场景下可以用到，比如一个网络状态监听服务，会不断的发送网络状态信息，接受者一旦注册就可以立即收到一个事件，可以知道当前的网络状态。
@@ -215,7 +236,7 @@ public <E> void postSticky(E event)
 ### @BusEvent
 
 还有一个注解 `@BusEvent` 可用于标注某个类是事件类，这个像 `@Override` 注解一样，纯标注用，没有其它用途，没有运行时消耗。
-  
+
 
 ## 项目状态
 

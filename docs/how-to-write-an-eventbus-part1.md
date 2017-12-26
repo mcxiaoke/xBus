@@ -1,5 +1,20 @@
 # 跟我一起写EventBus（一）
 
+<!-- TOC -->
+
+- [什么是`EventBus`](#什么是eventbus)
+- [接口定义](#接口定义)
+- [接口分析](#接口分析)
+- [开始实现](#开始实现)
+    - [查找使用 `@BusReceiver` 的方法](#查找使用-busreceiver-的方法)
+    - [`register(target)` 的实现](#registertarget-的实现)
+    - [`unregister(target)` 的实现](#unregistertarget-的实现)
+    - [`post(event)` 的实现](#postevent-的实现)
+- [测试一下](#测试一下)
+- [完整代码](#完整代码)
+
+<!-- /TOC -->
+
 ## 什么是`EventBus`
 
 先介绍一下概念， `EventBus` 直译过来就是`事件总线`，它使用发布订阅模式支持组件之间的通信，不需要显式地注册回调，比观察者模式更灵活，可用于替换Java中传统的事件监听模式，`EventBus`的作用就是解耦，它不是通用的发布订阅系统，也不能用于进程间通信。可用于Android的`EventBus`库主要有这几个：Google出品的`Guava`，`Guava`是一个庞大的库，`EventBus` 只是它附带的一个小功能，因此实际项目中使用并不多。用的最多的是[`greenrobot/EventBus`](https://github.com/greenrobot/EventBus)，这个库的优点是接口简洁，集成方便，但是限定了方法名，不支持注解。另一个库[`square/otto`](https://github.com/square/otto)修改自 `Guava` ，用的人也不少。
@@ -40,7 +55,7 @@ public class Service {
 
 ```java
 public interface IBus {
-    
+
     // register event target
     boolean register(Object target);
 
@@ -300,17 +315,17 @@ public class BusDemo {
 ## 相关阅读
 
 #### 什么是EventBus
-<https://code.google.com/p/guava-libraries/wiki/EventBusExplained>  
-<http://doc.akka.io/docs/akka/snapshot/java/event-bus.html>  
+<https://code.google.com/p/guava-libraries/wiki/EventBusExplained>
+<http://doc.akka.io/docs/akka/snapshot/java/event-bus.html>
 
 #### EventBus的实现
-<http://javarticles.com/2015/04/guava-eventbus-examples.html>  
-<http://timnew.me/blog/2014/12/06/typical-eventbus-design-patterns/>  
-<https://code.google.com/p/simpleeventbus/>  
-<https://github.com/greenrobot/EventBus/blob/master/HOWTO.md>  
+<http://javarticles.com/2015/04/guava-eventbus-examples.html>
+<http://timnew.me/blog/2014/12/06/typical-eventbus-design-patterns/>
+<https://code.google.com/p/simpleeventbus/>
+<https://github.com/greenrobot/EventBus/blob/master/HOWTO.md>
 
 #### EventBus的使用
-<http://www.cnblogs.com/peida/p/eventbus.html>  
-<http://blog.cainwong.com/using-an-eventbus-in-android-pt-1-why-an-eventbus/>  
-<http://blog.cainwong.com/using-an-eventbus-in-android-pt-2-sticking-your-config/>  
-<http://blog.cainwong.com/using-an-eventbus-in-android-pt-3-threading/>  
+<http://www.cnblogs.com/peida/p/eventbus.html>
+<http://blog.cainwong.com/using-an-eventbus-in-android-pt-1-why-an-eventbus/>
+<http://blog.cainwong.com/using-an-eventbus-in-android-pt-2-sticking-your-config/>
+<http://blog.cainwong.com/using-an-eventbus-in-android-pt-3-threading/>

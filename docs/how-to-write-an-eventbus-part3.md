@@ -1,5 +1,23 @@
 # 跟我一起写EventBus（三）
 
+<!-- TOC -->
+
+- [Scheduler接口](#scheduler接口)
+    - [发送者线程分发](#发送者线程分发)
+    - [主线程分发](#主线程分发)
+    - [独立线程分发](#独立线程分发)
+- [Scheduler使用](#scheduler使用)
+    - [定义](#定义)
+    - [事件模式](#事件模式)
+    - [使用方法](#使用方法)
+- [事件分发流程](#事件分发流程)
+    - [EventEmitter](#eventemitter)
+    - [Subscriber](#subscriber)
+    - [MethodInfo](#methodinfo)
+    - [分发事件](#分发事件)
+
+<!-- /TOC -->
+
 在 [`跟我一起写EventBus（一）`](how-to-write-an-eventbus-part1.md) 里实现了一个非常粗糙的`EventBus`，在 [`跟我一起写EventBus（二）`](how-to-write-an-eventbus-part2.md) ，又增加了基类中注册和事件类型宽泛匹配的功能，这一节需要加上在不同线程分发事件的功能，下面会详细解释事件的分发流程。
 
 在不同的线程分发事件（即在指定的线程调用使用了 `@BusReceiver` 注解的事件接收器的方法），主要支持三种线程：
@@ -142,22 +160,22 @@ public final class Schedulers {
 ```java
     // default is main thread
     public void onEvent0(String event){
-        // handle event 
+        // handle event
     }
-    
+
     @BusReceiver(mode= EventMode.Main)
     public void onEvent1(String event){
-       // handle event 
+       // handle event
     }
 
     @BusReceiver(mode= EventMode.Sender)
     public void onEvent2(String event){
-        // handle event 
+        // handle event
     }
 
     @BusReceiver(mode= EventMode.Thread)
     public void onEvent3(String event){
-        // handle event 
+        // handle event
     }
 ```
 
@@ -278,4 +296,4 @@ public class MethodInfo {
 ## 系列文章
 
 * [`跟我一起写EventBus（一）`](how-to-write-an-eventbus-part1.md)
-* [`跟我一起写EventBus（二）`](how-to-write-an-eventbus-part2.md) 
+* [`跟我一起写EventBus（二）`](how-to-write-an-eventbus-part2.md)

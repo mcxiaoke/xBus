@@ -1,5 +1,22 @@
 # 跟我一起写EventBus（四）
 
+<!-- TOC -->
+
+- [系列文章](#系列文章)
+- [概述](#概述)
+- [方法缓存](#方法缓存)
+    - [方法表缓存](#方法表缓存)
+        - [数据结构](#数据结构)
+        - [缓存流程](#缓存流程)
+    - [事件类型缓存](#事件类型缓存)
+    - [事件类型模糊匹配](#事件类型模糊匹配)
+    - [扩展接口](#扩展接口)
+        - [MethodFinder](#methodfinder)
+        - [其它方法](#其它方法)
+- [总结](#总结)
+
+<!-- /TOC -->
+
 ## 系列文章
 
 * [`跟我一起写EventBus（一）`](how-to-write-an-eventbus-part1.md)
@@ -51,7 +68,7 @@ final static Map<String, Set<MethodInfo>> sMethodCache =
     // 真正的实现代码在 addSubscribers() 里
         addSubscribers(target);
     }
-    
+
     private void addSubscribers(final Object target) {
         // 这里找出target里包含的所有事件接收器方法
         Set<MethodInfo> methods = getMethods(targetType);
@@ -59,7 +76,7 @@ final static Map<String, Set<MethodInfo>> sMethodCache =
             addSubscriber(subscriber);
         }
     }
-    
+
     // 查找方法和缓存的实现在这里
     private Set<MethodInfo> getMethods(Class<?> targetClass) {
         String cacheKey = targetClass.getName();
@@ -77,7 +94,7 @@ final static Map<String, Set<MethodInfo>> sMethodCache =
         }
         return methods;
     }
-    
+
 ```
 
 简单的测试显示，包含一千个方法的类，一次查找最多可能需要差不多20毫秒，Android应用大多数Activity和Fragment类都不会有这么多方法，大部分情况消耗的时间都在5毫秒以下，详细的性能测试后续会补充。有了缓存之后，后续再进入同一个界面，不需要重复查找，消耗的时间就是零了。
@@ -126,47 +143,47 @@ class ClassB extends ClassA{}
 class ClassC extends ClassB{}
 
 public class EventMatchDemo {
-    
+
     public void postTestEvent(){
-    // 假设发送的事件类型是 ClassA 
+    // 假设发送的事件类型是 ClassA
     	ClassA event=new ClassA();
         Bus.getDefault().post(event);
     }
-    
+
     @BusReceiver
     public void onEvent0(Object event){
     	// 所有的类都是Object的子类，能收到
-       // (event instanceof Object)==True  
+       // (event instanceof Object)==True
     }
-    
+
     @BusReceiver
     public void onEvent0(IClass event){
     	// ClassA是IClass的实现类，能收到
-       // (event instanceof IClass)==True  
+       // (event instanceof IClass)==True
     }
 
     @BusReceiver
     public void onEvent1(BaseClass event){
     	// ClassA是BaseClass的子类，能收到
-        // (event instanceof BaseClass)==True  
+        // (event instanceof BaseClass)==True
     }
 
     @BusReceiver
     public void onEventA(ClassA event){
     	// ClassA类型相同，能收到
-        //  (event instanceof ClassA)==True  
+        //  (event instanceof ClassA)==True
     }
 
     @BusReceiver
     public void onEventB(ClassB event){
         // 收不到，ClassA 不能强制类型转换为ClassB
-        // (event instanceof Object)==False  
+        // (event instanceof Object)==False
     }
 
     @BusReceiver
     public void onEventC(ClassC event){
         // 收不到，ClassA 不能强制类型转换为ClassC
-        // (event instanceof Object)==False  
+        // (event instanceof Object)==False
     }
 
 }
